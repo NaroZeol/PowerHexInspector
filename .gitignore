@@ -1,0 +1,7 @@
+obj/
+bin/
+*.dll
+lib/
+
+.vs/
+.vscode/

@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <useWPF>true</useWPF>
+    <Nullable>enable</Nullable>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Wox.Plugin">
+        <HintPath>".\lib\Wox.Plugin.dll"</HintPath>
+    </Reference>
+    <Reference Include="Wox.Infrastructure">
+        <HintPath>".\lib\Wox.Infrastructure.dll"</HintPath>
+    </Reference>
+    <Reference Include="PowerToys.Settings.UI.Lib">
+        <HintPath>".\lib\PowerToys.Settings.UI.Lib.dll"</HintPath>
+    </Reference>
+    <Reference Include="PowerToys.Common.UI">
+        <HintPath>".\lib\PowerToys.Common.UI.dll"</HintPath>
+    </Reference>
+    <Reference Include="PowerToys.ManagedCommon">
+        <HintPath>".\lib\PowerToys.ManagedCommon.dll"</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
