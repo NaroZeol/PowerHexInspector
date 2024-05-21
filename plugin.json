@@ -1,0 +1,12 @@
+{
+  "ID": "JSAKDJKALSJDIWDI1872Hdhad139319A",
+  "ActionKeyword": "insp",
+  "IsGlobal": false,
+  "Name": "HexInspector",
+  "Author": "NaroZeol",
+  "Version": "0.0.1",
+  "Language": "csharp",
+  "ExecuteFileName": "PowerHexInspector.dll",
+  "IcoPathDark": "Images\\bin.png",
+  "IcoPathLight": "Images\\bin.png"
+}
