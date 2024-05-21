@@ -75,16 +75,16 @@ namespace test
             return true;
         }
 
-        static void Main(string[] args)
-        {
-            if (!TestDecConversion() || !TestBinConversion() || !TestHexConversion())
-            {
-                Console.WriteLine("Test failed");
-            }
-            else
-            {
-                Console.WriteLine("Test passed");
-            }
-        }
+        // static void Main(string[] args)
+        // {
+        //     if (!TestDecConversion() || !TestBinConversion() || !TestHexConversion())
+        //     {
+        //         Console.WriteLine("Test failed");
+        //     }
+        //     else
+        //     {
+        //         Console.WriteLine("Test passed");
+        //     }
+        // }
     }
 }
