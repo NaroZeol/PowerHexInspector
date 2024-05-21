@@ -4,8 +4,9 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <useWPF>true</useWPF>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Nullable>enable</Nullable>
-    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,4 +26,5 @@
         <HintPath>".\lib\PowerToys.ManagedCommon.dll"</HintPath>
     </Reference>
   </ItemGroup>
+
 </Project>
