@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 namespace PowerHexInspector
 {
-    public class HexInspector : IPlugin, IDisposable, ISettingProvider, IContextMenu, IReloadable
+    public class HexInspector : IPlugin, IDisposable, ISettingProvider
     {
         #region IPlugin
         public string Name => "Hex Inspector";
@@ -53,7 +53,7 @@ namespace PowerHexInspector
             }
             return results;
         }
-        public List<Result> Query(Query query) {//  TODO
+        public List<Result> Query(Query query) {
             List<Result> results = new List<Result>();
             string queryStr = query.Search;
 
@@ -88,7 +88,9 @@ namespace PowerHexInspector
         #endregion
 
         #region IDisposable
-        public void Dispose() {throw new NotImplementedException();}//  TODO
+        public void Dispose() {
+            return; // Nothing need to dispose
+        }
         #endregion
 
         #region ISettingProvider
@@ -97,14 +99,6 @@ namespace PowerHexInspector
         public void UpdateSettings(PowerLauncherPluginSettings settings) {
             return;
         }
-        #endregion
-
-        #region IContextMenu
-        public List<ContextMenuResult> LoadContextMenus(Result selectedResult) {throw new NotImplementedException();} // TODO
-        #endregion
-
-        #region IReloadable
-        public void ReloadData() {throw new NotImplementedException();} // TODO
         #endregion
     }
 }
