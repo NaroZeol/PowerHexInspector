@@ -6,7 +6,7 @@
   "Author": "NaroZeol",
   "Version": "0.0.1",
   "Language": "csharp",
-  "ExecuteFileName": "PowerHexInspector.dll",
+  "ExecuteFileName": "Community.PowerToys.Run.Plugin.HexInspector.dll",
   "IcoPathDark": "Images\\bin.png",
   "IcoPathLight": "Images\\bin.png"
 }

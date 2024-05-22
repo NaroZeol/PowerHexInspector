@@ -7,6 +7,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Nullable>enable</Nullable>
+    <AssemblyName>Community.PowerToys.Run.Plugin.HexInspector</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,5 +27,18 @@
         <HintPath>".\lib\PowerToys.ManagedCommon.dll"</HintPath>
     </Reference>
   </ItemGroup>
+
+    <Target Name="Movefiles"
+            AfterTargets="Build">
+        <ItemGroup>
+            <MySourceFiles Include="./plugin.json" />
+            <MySourceFiles Include="$(OutputPath)Community.PowerToys.Run.Plugin.HexInspector.dll" />
+            <ImagesFile Include="./Images/*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(MySourceFiles)"
+              DestinationFolder="./bin/output/HexInspector" />
+        <Copy SourceFiles="@(ImagesFile)"
+              DestinationFolder="./bin/output/HexInspector/Images" />
+    </Target>
 
 </Project>
