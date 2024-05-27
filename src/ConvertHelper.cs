@@ -1,44 +1,123 @@
 ﻿namespace PowerHexInspector;
 
-public class Convert
+public static class Convert
 {
-    public static string Dec2Hex(string dec)
+    public class ConvertResult
     {
-        return System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16).ToUpper();
+        public string Raw { get; set; }
+        public string Format { get; set; }
+        public ConvertResult(string raw, string format)
+        {
+            Raw = raw;
+            Format = format;
+        }
+    }
+    public static ConvertResult Dec2Hex(string dec, bool upper = true)
+    {
+        string raw = System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16);
+        if (upper)
+        {
+            return new ConvertResult(raw, raw.ToUpper());
+        }
+        else
+        {
+            return new ConvertResult(raw, raw.ToLower());
+        }
     }
 
-    public static string Dec2Bin(string dec)
+    public static ConvertResult Dec2Bin(string dec, bool spilt = true)
     {
         string raw = System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2);
         if (raw.Length % 4 != 0 && raw != "0")
         {
             raw = raw.PadLeft(raw.Length + (4 - raw.Length % 4), '0');
         }
-        return raw;
+
+        if (spilt) // split every 4 bits
+        {
+            string[] splited = new string[raw.Length / 4];
+            for (int i = 0; i < raw.Length / 4; i++)
+            {
+                splited[i] = raw.Substring(i * 4, 4);
+            }
+            return new ConvertResult(raw, string.Join(" ", splited));
+        }
+        return new ConvertResult(raw, raw);
     }
 
-    public static string Hex2Dec(string hex)
+    public static ConvertResult Hex2Dec(string hex)
     {
-        return System.Convert.ToInt64(hex, 16).ToString();
+        string raw = System.Convert.ToInt64(hex, 16).ToString(); 
+        return new ConvertResult(raw, raw);
     }
 
-    public static string Hex2Bin(string hex)
+    public static ConvertResult Hex2Bin(string hex, bool spilt = true)
     {
         string raw = System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2);
         if (raw.Length % 4 != 0 && raw != "0")
         {
-            raw = raw.PadLeft(raw.Length + (4 - raw.Length % 4), '0');
+            raw = raw.PadLeft(raw.Length + (4 - raw.Length % 4), '0'); // Align to 4 bits
         }
-        return raw;
+
+        if (spilt) // Insert space every 4 bits
+        {
+            string[] splited = new string[raw.Length / 4];
+            for (int i = 0; i < raw.Length / 4; i++)
+            {
+                splited[i] = raw.Substring(i * 4, 4);
+            }
+            return new ConvertResult(raw, string.Join(" ", splited));
+        }
+        return new ConvertResult(raw, raw);
     }
 
-    public static string Bin2Dec(string bin)
+    public static ConvertResult Bin2Dec(string bin)
     {
-        return System.Convert.ToInt64(bin, 2).ToString();
+        string raw = System.Convert.ToInt64(bin, 2).ToString();
+        return new ConvertResult(raw, raw);
     }
 
-    public static string Bin2Hex(string bin)
+    public static ConvertResult Bin2Hex(string bin, bool upper = true)
     {
-        return System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16).ToUpper();
+        string raw = System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16);
+        if (upper)
+        {
+            return new ConvertResult(raw, raw.ToUpper());
+        }
+        else
+        {
+            return new ConvertResult(raw, raw.ToLower());
+        }
+    }
+
+    public static ConvertResult HexFormat(string hex, bool upper = true)
+    {
+        if (upper)
+        {
+            return new ConvertResult(hex, hex.ToUpper());
+        }
+        else
+        {
+            return new ConvertResult(hex, hex.ToLower());
+        }
+    }
+
+    public static ConvertResult BinFormat(string bin, bool spilt = true)
+    {
+        if (spilt)
+        {
+            string[] splited = new string[bin.Length / 4];
+            for (int i = 0; i < bin.Length / 4; i++)
+            {
+                splited[i] = bin.Substring(i * 4, 4);
+            }
+            return new ConvertResult(bin, string.Join(" ", splited));
+        }
+        return new ConvertResult(bin, bin);
+    }
+
+    public static ConvertResult DecFormat(string dec)
+    {
+        return new ConvertResult(dec, dec);
     }
 }
