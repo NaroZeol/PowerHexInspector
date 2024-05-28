@@ -14,27 +14,33 @@ namespace PowerHexInspector
 
         private bool _splitBinary;
 
-        private List<Result> ProduceResults (string queryStr) {
+        private List<Result> ProduceResults(string queryStr)
+        {
             var results = new List<Result>();
             char queryChar = queryStr[0];
             queryStr = queryStr.Substring(1);
-            if (queryStr.Length == 0) {
+            if (queryStr.Length == 0)
+            {
                 return results;
             }
             queryStr = queryStr.TrimStart();
-            try {
+            try
+            {
                 var conversions = new List<(Convert.ConvertResult, string)>();
-                if (queryChar == 'h' || queryChar == 'H') {
+                if (queryChar == 'h' || queryChar == 'H')
+                {
                     conversions.Add((Convert.HexFormat(queryStr, queryChar == 'H'), "hex"));   // hex
                     conversions.Add((Convert.Hex2Dec(queryStr), "dec"));
                     conversions.Add((Convert.Hex2Bin(queryStr, _splitBinary), "bin"));
                 }
-                else if (queryChar == 'b' || queryChar == 'B') {
+                else if (queryChar == 'b' || queryChar == 'B')
+                {
                     conversions.Add((Convert.Bin2Hex(queryStr, queryChar == 'B'), "hex"));
                     conversions.Add((Convert.Bin2Dec(queryStr), "dec"));
                     conversions.Add((Convert.BinFormat(queryStr, _splitBinary), "bin"));   // bin
                 }
-                else if (queryChar == 'd' || queryChar == 'D') {
+                else if (queryChar == 'd' || queryChar == 'D')
+                {
                     conversions.Add((Convert.Dec2Hex(queryStr, queryChar == 'D'), "hex"));
                     conversions.Add((Convert.DecFormat(queryStr), "dec"));   // dec
                     conversions.Add((Convert.Dec2Bin(queryStr, _splitBinary), "bin"));
@@ -49,7 +55,8 @@ namespace PowerHexInspector
                             Title = res.Format,
                             SubTitle = type,
                             IcoPath = $"Images\\{type}.png",
-                            Action = (e) => {
+                            Action = (e) =>
+                            {
                                 Utils.UtilsFunc.SetClipboardText(res.Raw);
                                 return true;
                             }
@@ -57,42 +64,49 @@ namespace PowerHexInspector
                     );
                 }
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 return []; // empty results
             }
             return results;
         }
-        public List<Result> Query(Query query) {
+        public List<Result> Query(Query query)
+        {
             var results = new List<Result>();
             string queryStr = query.Search;
 
-            if (queryStr.Length == 0) {
+            if (queryStr.Length == 0)
+            {
                 return results; // empty query
             }
 
-            try {
+            try
+            {
                 results = ProduceResults(queryStr);
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 return []; // empty results
             }
 
             return results;
         }
-        public void Init (PluginInitContext context) {
+        public void Init(PluginInitContext context)
+        {
             Log.Info("Hex Inspector plugin is initialized", typeof(HexInspector));
             return;
         }
         #endregion
 
         #region IDisposable
-        public void Dispose() {
+        public void Dispose()
+        {
             GC.SuppressFinalize(this);
         }
         #endregion
 
         #region ISettingProvider
-        public Control CreateSettingPanel(){throw new NotImplementedException();}
+        public Control CreateSettingPanel() { throw new NotImplementedException(); }
         public IEnumerable<PluginAdditionalOption> AdditionalOptions { get; } = new List<PluginAdditionalOption>()
         {
             new PluginAdditionalOption {
@@ -108,10 +122,12 @@ namespace PowerHexInspector
             //     Value = true,
             // }
         };
-        public void UpdateSettings(PowerLauncherPluginSettings settings) {
+        public void UpdateSettings(PowerLauncherPluginSettings settings)
+        {
             var SplitBinary = true;
 
-            if (settings != null && settings.AdditionalOptions != null) {
+            if (settings != null && settings.AdditionalOptions != null)
+            {
                 var optionSplitBin = settings.AdditionalOptions.FirstOrDefault(x => x.Key == "SplitBinary");
                 SplitBinary = optionSplitBin?.Value ?? SplitBinary;
             }
