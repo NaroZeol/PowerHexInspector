@@ -1,6 +1,6 @@
 # PowerHexInspector
 
-A simple PowerToys Run plugin.
+A simple [PowerToys Run](https://learn.microsoft.com/en-us/windows/powertoys/run) plugin.
 
 Provides functionality to convert numbers to different bases.
 
@@ -26,6 +26,8 @@ The base can be one of the following values:
 
 ![Example](./Images/examples/ep1.png)
 
+Clicking or pressing `Enter` will copy the conversion result to the clipboard.
+
 ## Installation
 Download the latest release, extract it, and place the `PowerHexInspector` folder into the `%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins` directory. Then, restart PowerToys.
 
@@ -33,7 +35,7 @@ Download the latest release, extract it, and place the `PowerHexInspector` folde
 This plugin is still in development and may have various unknown bugs and crashes.
 
 ## TODO !!!
-- [ ] Support formatted output (spacing, casing, etc.)
-- [ ] Add icon
+- [x] Support formatted output (spacing, casing, etc.)
+- [x] Add icon
 - [ ] Support big-endian
 - [ ] Support settings for different bit lengths (currently fixed at 64-bit)

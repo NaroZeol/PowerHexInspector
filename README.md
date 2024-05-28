@@ -1,8 +1,10 @@
 # PowerHexInspector
 
-一个简单的powertoys run插件。
+一个简单的[powertoys run](https://learn.microsoft.com/en-us/windows/powertoys/run)插件。
 
 提供将数字转化为其他进制的功能。
+
+[English Doc](./README_EN.md)
 
 ## 使用方法
 
@@ -26,6 +28,8 @@
 
 ![](./Images/examples/ep1.png)
 
+点击或按下`Enter`会将转换结果复制到剪贴板中。
+
 ## 安装
 下载最新的release，解压后将`PowerHexInspector`文件夹放入`%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins`文件夹中，然后重启powertoys即可。
 
@@ -33,7 +37,7 @@
 该插件还处于开发阶段，可能会有各种未知的bug和崩溃。
 
 ## TODO ！！！
-- [ ] 支持格式化输出（间隔，大小写等）
-- [ ] 添加图标
+- [x] 支持格式化输出（间隔，大小写等）
+- [x] 添加图标
 - [ ] 支持大端序
 - [ ] 支持对不同位数的设置（当前固定为64位）
