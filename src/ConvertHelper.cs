@@ -17,11 +17,11 @@ public static class Convert
         string raw = System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16);
         if (upper)
         {
-            return new ConvertResult(raw, raw.ToUpper());
+            return new ConvertResult(raw.ToUpper(), raw.ToUpper());
         }
         else
         {
-            return new ConvertResult(raw, raw.ToLower());
+            return new ConvertResult(raw.ToLower(), raw.ToLower());
         }
     }
 
@@ -82,11 +82,11 @@ public static class Convert
         string raw = System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16);
         if (upper)
         {
-            return new ConvertResult(raw, raw.ToUpper());
+            return new ConvertResult(raw.ToUpper(), raw.ToUpper());
         }
         else
         {
-            return new ConvertResult(raw, raw.ToLower());
+            return new ConvertResult(raw.ToLower(), raw.ToLower());
         }
     }
 
@@ -94,16 +94,17 @@ public static class Convert
     {
         if (upper)
         {
-            return new ConvertResult(hex, hex.ToUpper());
+            return new ConvertResult(hex.ToUpper(), hex.ToUpper());
         }
         else
         {
-            return new ConvertResult(hex, hex.ToLower());
+            return new ConvertResult(hex.ToLower(), hex.ToLower());
         }
     }
 
     public static ConvertResult BinFormat(string bin, bool spilt = true)
     {
+        bin = bin.PadLeft(bin.Length + (4 - bin.Length % 4), '0');
         if (spilt)
         {
             string[] splited = new string[bin.Length / 4];
