@@ -7,6 +7,6 @@
   "Version": "0.0.1",
   "Language": "csharp",
   "ExecuteFileName": "Community.PowerToys.Run.Plugin.HexInspector.dll",
-  "IcoPathDark": "Images\\bin.png",
-  "IcoPathLight": "Images\\bin.png"
+  "IcoPathDark": "Images\\HexInspector.dark.png",
+  "IcoPathLight": "Images\\HexInspector.light.png"
 }

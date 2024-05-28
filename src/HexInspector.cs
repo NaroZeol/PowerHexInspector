@@ -2,6 +2,7 @@ using Wox.Plugin;
 using Wox.Plugin.Logger;
 using Microsoft.PowerToys.Settings.UI.Library;
 using System.Windows.Controls;
+using ManagedCommon;
 
 namespace PowerHexInspector
 {
@@ -11,7 +12,8 @@ namespace PowerHexInspector
         public string Name => "Hex Inspector";
         public string Description => "A simple powertoys run plugin provides fast and easy way to peek other forms of an input value";
         public static string PluginID => "JSAKDJKALSJDIWDI1872Hdhad139319A";
-
+        private string IconPath { get; set; }
+        private PluginInitContext Context { get; set; }
         private bool _splitBinary;
 
         private List<Result> ProduceResults(string queryStr)
@@ -54,7 +56,7 @@ namespace PowerHexInspector
                         {
                             Title = res.Format,
                             SubTitle = type,
-                            IcoPath = $"Images\\{type}.png",
+                            IcoPath = IconPath,
                             Action = (e) =>
                             {
                                 Utils.UtilsFunc.SetClipboardText(res.Raw);
@@ -94,7 +96,10 @@ namespace PowerHexInspector
         public void Init(PluginInitContext context)
         {
             Log.Info("Hex Inspector plugin is initialized", typeof(HexInspector));
-            return;
+            Context = context ?? throw new ArgumentNullException(paramName: nameof(context));
+
+            Context.API.ThemeChanged += OnThemeChanged;
+            UpdateIconPath(Context.API.GetCurrentTheme());
         }
         #endregion
 
@@ -135,6 +140,25 @@ namespace PowerHexInspector
             _splitBinary = SplitBinary;
 
             return;
+        }
+        #endregion
+
+        #region Icon
+        private void OnThemeChanged(Theme currentTheme, Theme newTheme)
+        {
+            UpdateIconPath(newTheme);
+        }
+
+        private void UpdateIconPath(Theme theme)
+        {
+            if (theme == Theme.Light || theme == Theme.HighContrastWhite)
+            {
+                IconPath = "Images/HexInspector.light.png";
+            }
+            else
+            {
+                IconPath = "Images/HexInspector.dark.png";
+            }
         }
         #endregion
     }
