@@ -6,7 +6,6 @@
     <useWPF>true</useWPF>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <Nullable>enable</Nullable>
     <AssemblyName>Community.PowerToys.Run.Plugin.HexInspector</AssemblyName>
   </PropertyGroup>
 
