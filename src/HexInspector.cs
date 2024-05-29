@@ -8,7 +8,6 @@ namespace PowerHexInspector
 {
     public class HexInspector : IPlugin, IDisposable, ISettingProvider
     {
-        #region IPlugin
         public string Name => "Hex Inspector";
         public string Description => "A simple powertoys run plugin provides fast and easy way to peek other forms of an input value";
         public static string PluginID => "JSAKDJKALSJDIWDI1872Hdhad139319A";
@@ -19,7 +18,9 @@ namespace PowerHexInspector
         private bool _outputEndian;
         private static readonly bool LittleEndian = true;
         private static readonly bool BigEndian = false;
+        private bool _disposed;
 
+        #region IPlugin
         private List<Result> ProduceResults(string queryStr)
         {
             var results = new List<Result>();
@@ -59,7 +60,7 @@ namespace PowerHexInspector
                         new Result
                         {
                             Title = res.Format,
-                            SubTitle = type + (_outputEndian ? " (Little": " (Big") + " Endian)",
+                            SubTitle = type + (_outputEndian ? " (Little" : " (Big") + " Endian)",
                             IcoPath = IconPath,
                             Action = (e) =>
                             {
@@ -104,13 +105,6 @@ namespace PowerHexInspector
 
             Context.API.ThemeChanged += OnThemeChanged;
             UpdateIconPath(Context.API.GetCurrentTheme());
-        }
-        #endregion
-
-        #region IDisposable
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
         }
         #endregion
 
@@ -189,6 +183,29 @@ namespace PowerHexInspector
             else
             {
                 IconPath = "Images/HexInspector.dark.png";
+            }
+        }
+        #endregion
+
+        #region IDisposable
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (Context != null && Context.API != null)
+                    {
+                        Context.API.ThemeChanged -= OnThemeChanged;
+                    }
+
+                    _disposed = true;
+                }
             }
         }
         #endregion
