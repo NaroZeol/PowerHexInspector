@@ -16,9 +16,11 @@ namespace PowerHexInspector
         private bool _splitBinary;
         private bool _inputEndian;
         private bool _outputEndian;
+        private int _bitLength;
         private static readonly bool LittleEndian = true;
         private static readonly bool BigEndian = false;
         private bool _disposed;
+        private readonly Convert converter = new Convert();
 
         #region IPlugin
         private List<Result> ProduceResults(string queryStr)
@@ -36,21 +38,24 @@ namespace PowerHexInspector
                 var conversions = new List<(Convert.ConvertResult, string)>();
                 if (queryChar == 'h' || queryChar == 'H')
                 {
-                    conversions.Add((Convert.HexFormat(queryStr, queryChar == 'H', _inputEndian, _outputEndian), "HEX"));   // hex
-                    conversions.Add((Convert.Hex2Dec(queryStr, _inputEndian, _outputEndian), "DEC"));
-                    conversions.Add((Convert.Hex2Bin(queryStr, _splitBinary, _inputEndian, _outputEndian), "BIN"));
+                    bool is_upper = queryChar == 'H';
+                    conversions.Add((converter.HexFormat(queryStr, is_upper, _inputEndian, _outputEndian), "HEX"));   // hex
+                    conversions.Add((converter.Hex2Dec(queryStr, _inputEndian, _outputEndian), "DEC"));
+                    conversions.Add((converter.Hex2Bin(queryStr, _splitBinary, _inputEndian, _outputEndian), "BIN"));
                 }
                 else if (queryChar == 'b' || queryChar == 'B')
                 {
-                    conversions.Add((Convert.Bin2Hex(queryStr, queryChar == 'B', _inputEndian, _outputEndian), "HEX"));
-                    conversions.Add((Convert.Bin2Dec(queryStr, _inputEndian, _outputEndian), "DEC"));
-                    conversions.Add((Convert.BinFormat(queryStr, _splitBinary, _inputEndian, _outputEndian), "BIN"));   // bin
+                    bool is_upper = queryChar == 'B';
+                    conversions.Add((converter.Bin2Hex(queryStr, is_upper, _inputEndian, _outputEndian), "HEX"));
+                    conversions.Add((converter.Bin2Dec(queryStr, _inputEndian, _outputEndian), "DEC"));
+                    conversions.Add((converter.BinFormat(queryStr, _splitBinary, _inputEndian, _outputEndian), "BIN"));   // bin
                 }
                 else if (queryChar == 'd' || queryChar == 'D')
                 {
-                    conversions.Add((Convert.Dec2Hex(queryStr, queryChar == 'D', _inputEndian, _outputEndian), "HEX"));
-                    conversions.Add((Convert.DecFormat(queryStr), "DEC"));   // dec
-                    conversions.Add((Convert.Dec2Bin(queryStr, _splitBinary, _inputEndian, _outputEndian), "BIN"));
+                    bool is_upper = queryChar == 'D';
+                    conversions.Add((converter.Dec2Hex(queryStr, is_upper, _inputEndian, _outputEndian), "HEX"));
+                    conversions.Add((converter.DecFormat(queryStr), "DEC"));   // dec
+                    conversions.Add((converter.Dec2Bin(queryStr, _splitBinary, _inputEndian, _outputEndian), "BIN"));
                 }
 
                 foreach ((Convert.ConvertResult res, string type) in conversions)
@@ -141,6 +146,20 @@ namespace PowerHexInspector
                     new KeyValuePair<string, string>("Little Endian", "0"),
                     new KeyValuePair<string, string>("Big Endian", "1"),
                 }
+            },
+            new PluginAdditionalOption {
+                Key = "BitLength",
+                DisplayLabel = "Bit Lengths",
+                DisplayDescription = "",
+                PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
+                ComboBoxValue = 64,
+                ComboBoxItems = new List<KeyValuePair<string, string>>()
+                {
+                    new KeyValuePair<string, string>("BYTE", "8"),
+                    new KeyValuePair<string, string>("WORD", "16"),
+                    new KeyValuePair<string, string>("DWORD", "32"),
+                    new KeyValuePair<string, string>("QWORD", "64"),
+                }
             }
         };
         public void UpdateSettings(PowerLauncherPluginSettings settings)
@@ -148,6 +167,7 @@ namespace PowerHexInspector
             var SplitBinary = true;
             var InputEndian = LittleEndian;
             var OutputEndian = LittleEndian;
+            var BitLength = 64;
 
             if (settings != null && settings.AdditionalOptions != null)
             {
@@ -159,11 +179,15 @@ namespace PowerHexInspector
 
                 var optionEndian = settings.AdditionalOptions.FirstOrDefault(x => x.Key == "OutputEndian");
                 OutputEndian = optionEndian.ComboBoxValue == 0 ? LittleEndian : BigEndian;
+
+                var optionBitLength = settings.AdditionalOptions.FirstOrDefault(x => x.Key == "BitLength");
+                BitLength = optionBitLength.ComboBoxValue;
             }
 
             _splitBinary = SplitBinary;
             _inputEndian = InputEndian;
             _outputEndian = OutputEndian;
+            _bitLength = BitLength;
             return;
         }
         #endregion
