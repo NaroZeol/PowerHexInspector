@@ -1,6 +1,6 @@
 ﻿namespace PowerHexInspector;
 
-public static class Convert
+public class Convert
 {
     private static readonly bool LittleEndian = true;
     private static readonly bool BigEndian = false;
@@ -14,7 +14,7 @@ public static class Convert
             Format = format;
         }
     }
-    private static string HexToBigEndian(string hex)
+    private string HexToBigEndian(string hex)
     {
         if (hex.Length < 2)
         {
@@ -32,7 +32,7 @@ public static class Convert
         Array.Reverse(splited);
         return string.Join("", splited);
     }
-    private static string BinToBigEndian(string bin)
+    private string BinToBigEndian(string bin)
     {
         if (bin.Length < 8)
         {
@@ -50,15 +50,15 @@ public static class Convert
         Array.Reverse(splited);
         return string.Join("", splited);
     }
-    private static string HexToLittleEndian(string hex)
+    private string HexToLittleEndian(string hex)
     {
         return HexToBigEndian(hex); // Same logic
     }
-    private static string BinToLittleEndian(string bin)
+    private string BinToLittleEndian(string bin)
     {
         return BinToBigEndian(bin); // Same logic
     }
-    public static ConvertResult Dec2Hex(string dec, bool upper, bool inputEndian, bool outputEndian)
+    public ConvertResult Dec2Hex(string dec, bool upper, bool inputEndian, bool outputEndian)
     {
         string raw = System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16);
         if (outputEndian == BigEndian)
@@ -75,7 +75,7 @@ public static class Convert
             return new ConvertResult(raw.ToLower(), raw.ToLower());
         }
     }
-    public static ConvertResult Dec2Bin(string dec, bool spilt, bool inputEndian, bool outputEndian)
+    public ConvertResult Dec2Bin(string dec, bool spilt, bool inputEndian, bool outputEndian)
     {
         string raw = System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2);
         if (outputEndian == BigEndian)
@@ -99,7 +99,7 @@ public static class Convert
         return new ConvertResult(raw, raw);
     }
 
-    public static ConvertResult Hex2Dec(string hex, bool inputEndian, bool outputEndian)
+    public ConvertResult Hex2Dec(string hex, bool inputEndian, bool outputEndian)
     {
         if (inputEndian == BigEndian) // input is big endian
         {
@@ -109,7 +109,7 @@ public static class Convert
         return new ConvertResult(raw, raw);
     }
 
-    public static ConvertResult Hex2Bin(string hex, bool spilt, bool inputEndian, bool outputEndian)
+    public ConvertResult Hex2Bin(string hex, bool spilt, bool inputEndian, bool outputEndian)
     {
         if (inputEndian == BigEndian)
         {
@@ -137,7 +137,7 @@ public static class Convert
         return new ConvertResult(raw, raw);
     }
 
-    public static ConvertResult Bin2Dec(string bin, bool inputEndian, bool outputEndian)
+    public ConvertResult Bin2Dec(string bin, bool inputEndian, bool outputEndian)
     {
         if (inputEndian == BigEndian)
         {
@@ -147,7 +147,7 @@ public static class Convert
         return new ConvertResult(raw, raw);
     }
 
-    public static ConvertResult Bin2Hex(string bin, bool upper, bool inputEndian, bool outputEndian)
+    public ConvertResult Bin2Hex(string bin, bool upper, bool inputEndian, bool outputEndian)
     {
         if (inputEndian == BigEndian)
         {
@@ -169,7 +169,7 @@ public static class Convert
         }
     }
 
-    public static ConvertResult HexFormat(string hex, bool upper, bool inputEndian, bool outputEndian)
+    public ConvertResult HexFormat(string hex, bool upper, bool inputEndian, bool outputEndian)
     {
         if (inputEndian != outputEndian)
         {
@@ -192,7 +192,7 @@ public static class Convert
         }
     }
 
-    public static ConvertResult BinFormat(string bin, bool spilt, bool inputEndian, bool outputEndian)
+    public ConvertResult BinFormat(string bin, bool spilt, bool inputEndian, bool outputEndian)
     {
         if (inputEndian != outputEndian)
         {
@@ -221,7 +221,7 @@ public static class Convert
         return new ConvertResult(bin, bin);
     }
 
-    public static ConvertResult DecFormat(string dec)
+    public ConvertResult DecFormat(string dec)
     {
         return new ConvertResult(dec, dec);
     }
