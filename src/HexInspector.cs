@@ -13,15 +13,15 @@ namespace PowerHexInspector
         public static string PluginID => "JSAKDJKALSJDIWDI1872Hdhad139319A";
         private string IconPath { get; set; }
         private PluginInitContext Context { get; set; }
-        private bool _splitBinary;
-        private bool _inputEndian;
-        private bool _outputEndian;
-        private int _bitLength;
-        private static readonly bool LittleEndian = true;
-        private static readonly bool BigEndian = false;
         private static readonly List<string> FilterStrs = [" ", "_", ",", "0x"];
         private bool _disposed;
-        private readonly Convert converter = new Convert();
+        private readonly SettingsHelper settings;
+        private readonly Convert converter;
+        public HexInspector()
+        {
+            settings = new SettingsHelper();
+            converter = new Convert(settings);
+        }
 
         #region IPlugin
         private List<Result> ProduceResults(string queryStr)
@@ -43,23 +43,23 @@ namespace PowerHexInspector
                 if (queryChar == 'h' || queryChar == 'H')
                 {
                     bool is_upper = queryChar == 'H';
-                    conversions.Add((converter.HexFormat(queryStr, is_upper, _inputEndian, _outputEndian), "HEX"));   // hex
-                    conversions.Add((converter.Hex2Dec(queryStr, _inputEndian, _outputEndian), "DEC"));
-                    conversions.Add((converter.Hex2Bin(queryStr, _splitBinary, _inputEndian, _outputEndian), "BIN"));
+                    conversions.Add((converter.HexFormat(queryStr, is_upper), "HEX"));   // hex
+                    conversions.Add((converter.Hex2Dec(queryStr), "DEC"));
+                    conversions.Add((converter.Hex2Bin(queryStr), "BIN"));
                 }
                 else if (queryChar == 'b' || queryChar == 'B')
                 {
                     bool is_upper = queryChar == 'B';
-                    conversions.Add((converter.Bin2Hex(queryStr, is_upper, _inputEndian, _outputEndian), "HEX"));
-                    conversions.Add((converter.Bin2Dec(queryStr, _inputEndian, _outputEndian), "DEC"));
-                    conversions.Add((converter.BinFormat(queryStr, _splitBinary, _inputEndian, _outputEndian), "BIN"));   // bin
+                    conversions.Add((converter.Bin2Hex(queryStr, is_upper), "HEX"));
+                    conversions.Add((converter.Bin2Dec(queryStr), "DEC"));
+                    conversions.Add((converter.BinFormat(queryStr), "BIN"));   // bin
                 }
                 else if (queryChar == 'd' || queryChar == 'D')
                 {
                     bool is_upper = queryChar == 'D';
-                    conversions.Add((converter.Dec2Hex(queryStr, is_upper, _inputEndian, _outputEndian), "HEX"));
+                    conversions.Add((converter.Dec2Hex(queryStr, is_upper), "HEX"));
                     conversions.Add((converter.DecFormat(queryStr), "DEC"));   // dec
-                    conversions.Add((converter.Dec2Bin(queryStr, _splitBinary, _inputEndian, _outputEndian), "BIN"));
+                    conversions.Add((converter.Dec2Bin(queryStr), "BIN"));
                 }
 
                 foreach ((Convert.ConvertResult res, string type) in conversions)
@@ -69,7 +69,7 @@ namespace PowerHexInspector
                         new Result
                         {
                             Title = res.Format,
-                            SubTitle = type + (_outputEndian ? " (Little" : " (Big") + " Endian)",
+                            SubTitle = type + (settings.OutputEndian ? " (Little" : " (Big") + " Endian)",
                             IcoPath = IconPath,
                             Action = (e) =>
                             {
@@ -133,11 +133,11 @@ namespace PowerHexInspector
                 DisplayDescription = "Little or Big Endian setting for input",
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
                 ComboBoxValue = 0,
-                ComboBoxItems = new List<KeyValuePair<string, string>>()
-                {
+                ComboBoxItems =
+                [
                     new KeyValuePair<string, string>("Little Endian", "0"),
                     new KeyValuePair<string, string>("Big Endian", "1"),
-                }
+                ]
             },
             new PluginAdditionalOption {
                 Key = "OutputEndian",
@@ -145,11 +145,11 @@ namespace PowerHexInspector
                 DisplayDescription = "Little or Big Endian setting for output",
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
                 ComboBoxValue = 0,
-                ComboBoxItems = new List<KeyValuePair<string, string>>()
-                {
+                ComboBoxItems =
+                [
                     new KeyValuePair<string, string>("Little Endian", "0"),
                     new KeyValuePair<string, string>("Big Endian", "1"),
-                }
+                ]
             },
             new PluginAdditionalOption {
                 Key = "BitLength",
@@ -157,41 +157,18 @@ namespace PowerHexInspector
                 DisplayDescription = "",
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
                 ComboBoxValue = 64,
-                ComboBoxItems = new List<KeyValuePair<string, string>>()
-                {
+                ComboBoxItems =
+                [
                     new KeyValuePair<string, string>("BYTE", "8"),
                     new KeyValuePair<string, string>("WORD", "16"),
                     new KeyValuePair<string, string>("DWORD", "32"),
                     new KeyValuePair<string, string>("QWORD", "64"),
-                }
+                ]
             }
         };
         public void UpdateSettings(PowerLauncherPluginSettings settings)
         {
-            var SplitBinary = true;
-            var InputEndian = LittleEndian;
-            var OutputEndian = LittleEndian;
-            var BitLength = 64;
-
-            if (settings != null && settings.AdditionalOptions != null)
-            {
-                var optionSplitBin = settings.AdditionalOptions.FirstOrDefault(x => x.Key == "SplitBinary");
-                SplitBinary = optionSplitBin?.Value ?? SplitBinary;
-
-                var optionAffectInput = settings.AdditionalOptions.FirstOrDefault(x => x.Key == "InputEndian");
-                InputEndian = optionAffectInput.ComboBoxValue == 0 ? LittleEndian : BigEndian;
-
-                var optionEndian = settings.AdditionalOptions.FirstOrDefault(x => x.Key == "OutputEndian");
-                OutputEndian = optionEndian.ComboBoxValue == 0 ? LittleEndian : BigEndian;
-
-                var optionBitLength = settings.AdditionalOptions.FirstOrDefault(x => x.Key == "BitLength");
-                BitLength = optionBitLength.ComboBoxValue;
-            }
-
-            _splitBinary = SplitBinary;
-            _inputEndian = InputEndian;
-            _outputEndian = OutputEndian;
-            _bitLength = BitLength;
+            this.settings.UpdateSettings(settings);
             return;
         }
         #endregion

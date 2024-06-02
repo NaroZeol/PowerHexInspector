@@ -2,8 +2,11 @@
 
 public class Convert
 {
-    private static readonly bool LittleEndian = true;
-    private static readonly bool BigEndian = false;
+    private readonly SettingsHelper settings;
+    public Convert(SettingsHelper settingHelper)
+    {
+        this.settings = settingHelper;
+    }
     public class ConvertResult
     {
         public string Raw { get; set; }
@@ -58,10 +61,10 @@ public class Convert
     {
         return BinToBigEndian(bin); // Same logic
     }
-    public ConvertResult Dec2Hex(string dec, bool upper, bool inputEndian, bool outputEndian)
+    public ConvertResult Dec2Hex(string dec, bool upper)
     {
         string raw = System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16);
-        if (outputEndian == BigEndian)
+        if (settings.InputEndian == SettingsHelper.BigEndian)
         {
             raw = HexToBigEndian(raw);
         }
@@ -75,15 +78,15 @@ public class Convert
             return new ConvertResult(raw.ToLower(), raw.ToLower());
         }
     }
-    public ConvertResult Dec2Bin(string dec, bool spilt, bool inputEndian, bool outputEndian)
+    public ConvertResult Dec2Bin(string dec)
     {
         string raw = System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2);
-        if (outputEndian == BigEndian)
+        if (settings.InputEndian == SettingsHelper.BigEndian)
         {
             raw = BinToBigEndian(raw);
         }
 
-        if (spilt) // split every 4 bits
+        if (settings.SplitBinary) // split every 4 bits
         {
             if (raw.Length % 4 != 0)
             {
@@ -99,29 +102,29 @@ public class Convert
         return new ConvertResult(raw, raw);
     }
 
-    public ConvertResult Hex2Dec(string hex, bool inputEndian, bool outputEndian)
+    public ConvertResult Hex2Dec(string hex)
     {
-        if (inputEndian == BigEndian) // input is big endian
+        if (settings.InputEndian == SettingsHelper.BigEndian) // input is big endian
         {
             hex = HexToLittleEndian(hex); // Convert to little endian
         }
-        string raw = System.Convert.ToInt64(hex, 16).ToString(); 
+        string raw = System.Convert.ToInt64(hex, 16).ToString();
         return new ConvertResult(raw, raw);
     }
 
-    public ConvertResult Hex2Bin(string hex, bool spilt, bool inputEndian, bool outputEndian)
+    public ConvertResult Hex2Bin(string hex)
     {
-        if (inputEndian == BigEndian)
+        if (settings.InputEndian == SettingsHelper.BigEndian)
         {
             hex = HexToLittleEndian(hex);
         }
         string raw = System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2);
-        if (outputEndian == BigEndian)
+        if (settings.OutputEndian == SettingsHelper.BigEndian)
         {
             raw = BinToBigEndian(raw);
         }
 
-        if (spilt) // Insert space every 4 bits
+        if (settings.SplitBinary) // Insert space every 4 bits
         {
             if (raw.Length % 4 != 0)
             {
@@ -137,9 +140,9 @@ public class Convert
         return new ConvertResult(raw, raw);
     }
 
-    public ConvertResult Bin2Dec(string bin, bool inputEndian, bool outputEndian)
+    public ConvertResult Bin2Dec(string bin)
     {
-        if (inputEndian == BigEndian)
+        if (settings.InputEndian == SettingsHelper.BigEndian)
         {
             bin = BinToLittleEndian(bin);
         }
@@ -147,14 +150,14 @@ public class Convert
         return new ConvertResult(raw, raw);
     }
 
-    public ConvertResult Bin2Hex(string bin, bool upper, bool inputEndian, bool outputEndian)
+    public ConvertResult Bin2Hex(string bin, bool upper)
     {
-        if (inputEndian == BigEndian)
+        if (settings.InputEndian == SettingsHelper.BigEndian)
         {
             bin = BinToLittleEndian(bin);
         }
         string raw = System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16);
-        if (outputEndian == BigEndian)
+        if (settings.OutputEndian == SettingsHelper.BigEndian)
         {
             raw = HexToBigEndian(raw);
         }
@@ -169,15 +172,15 @@ public class Convert
         }
     }
 
-    public ConvertResult HexFormat(string hex, bool upper, bool inputEndian, bool outputEndian)
+    public ConvertResult HexFormat(string hex, bool upper)
     {
-        if (inputEndian != outputEndian)
+        if (settings.InputEndian != settings.OutputEndian)
         {
-            if (inputEndian == LittleEndian && outputEndian == BigEndian)
+            if (settings.InputEndian == SettingsHelper.LittleEndian && settings.OutputEndian == SettingsHelper.BigEndian)
             {
                 hex = HexToBigEndian(hex);
             }
-            else if (inputEndian == BigEndian && outputEndian == LittleEndian)
+            else if (settings.InputEndian == SettingsHelper.BigEndian && settings.OutputEndian == SettingsHelper.LittleEndian)
             {
                 hex = HexToLittleEndian(hex);
             }
@@ -192,20 +195,20 @@ public class Convert
         }
     }
 
-    public ConvertResult BinFormat(string bin, bool spilt, bool inputEndian, bool outputEndian)
+    public ConvertResult BinFormat(string bin)
     {
-        if (inputEndian != outputEndian)
+        if (settings.InputEndian != settings.OutputEndian)
         {
-            if (inputEndian == LittleEndian && outputEndian == BigEndian)
+            if (settings.InputEndian == SettingsHelper.LittleEndian && settings.OutputEndian == SettingsHelper.BigEndian)
             {
                 bin = BinToBigEndian(bin);
             }
-            else if (inputEndian == BigEndian && outputEndian == LittleEndian)
+            else if (settings.InputEndian == SettingsHelper.BigEndian && settings.OutputEndian == SettingsHelper.LittleEndian)
             {
                 bin = BinToLittleEndian(bin);
             }
         }
-        if (spilt)
+        if (settings.SplitBinary)
         {
             if (bin.Length % 4 != 0) // Align to 4 bits
             {
