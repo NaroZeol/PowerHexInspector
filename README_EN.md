@@ -33,9 +33,3 @@ Download the latest release, extract it, and place the `PowerHexInspector` folde
 
 ## Disclaimer
 This plugin is still in development and may have various unknown bugs and crashes.
-
-## TODO !!!
-- [x] Support formatted output (spacing, casing, etc.)
-- [x] Add icon
-- [ ] Support big-endian
-- [ ] Support settings for different bit lengths (currently fixed at 64-bit)
