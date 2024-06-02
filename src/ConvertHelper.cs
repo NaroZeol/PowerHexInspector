@@ -63,7 +63,15 @@ public class Convert
     }
     public ConvertResult Dec2Hex(string dec, bool upper)
     {
-        string raw = System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16);
+        string raw = settings.BitLength switch
+        {
+            8 => System.Convert.ToString(System.Convert.ToSByte(dec, 10), 16),
+            16 => System.Convert.ToString(System.Convert.ToInt16(dec, 10), 16),
+            32 => System.Convert.ToString(System.Convert.ToInt32(dec, 10), 16),
+            64 => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16),
+            _ => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16)
+        };
+
         if (settings.InputEndian == SettingsHelper.BigEndian)
         {
             raw = HexToBigEndian(raw);
@@ -80,7 +88,15 @@ public class Convert
     }
     public ConvertResult Dec2Bin(string dec)
     {
-        string raw = System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2);
+        string raw = settings.BitLength switch
+        {
+            8 => System.Convert.ToString(System.Convert.ToSByte(dec, 10), 2),
+            16 => System.Convert.ToString(System.Convert.ToInt16(dec, 10), 2),
+            32 => System.Convert.ToString(System.Convert.ToInt32(dec, 10), 2),
+            64 => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2),
+            _ => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2)
+        };
+
         if (settings.InputEndian == SettingsHelper.BigEndian)
         {
             raw = BinToBigEndian(raw);
@@ -108,7 +124,14 @@ public class Convert
         {
             hex = HexToLittleEndian(hex); // Convert to little endian
         }
-        string raw = System.Convert.ToInt64(hex, 16).ToString();
+        string raw = settings.BitLength switch
+        {
+            8 => System.Convert.ToSByte(hex, 16).ToString(),
+            16 => System.Convert.ToInt16(hex, 16).ToString(),
+            32 => System.Convert.ToInt32(hex, 16).ToString(),
+            64 => System.Convert.ToInt64(hex, 16).ToString(),
+            _ => System.Convert.ToInt64(hex, 16).ToString(),
+        };
         return new ConvertResult(raw, raw);
     }
 
@@ -118,7 +141,16 @@ public class Convert
         {
             hex = HexToLittleEndian(hex);
         }
-        string raw = System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2);
+
+        string raw = settings.BitLength switch
+        {
+            8 => System.Convert.ToString(System.Convert.ToSByte(hex, 16), 2),
+            16 => System.Convert.ToString(System.Convert.ToInt16(hex, 16), 2),
+            32 => System.Convert.ToString(System.Convert.ToInt32(hex, 16), 2),
+            64 => System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2),
+            _ => System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2)
+        };
+
         if (settings.OutputEndian == SettingsHelper.BigEndian)
         {
             raw = BinToBigEndian(raw);
@@ -146,7 +178,14 @@ public class Convert
         {
             bin = BinToLittleEndian(bin);
         }
-        string raw = System.Convert.ToInt64(bin, 2).ToString();
+        string raw = settings.BitLength switch
+        {
+            8 => System.Convert.ToSByte(bin, 2).ToString(),
+            16 => System.Convert.ToInt16(bin, 2).ToString(),
+            32 => System.Convert.ToInt32(bin, 2).ToString(),
+            64 => System.Convert.ToInt64(bin, 2).ToString(),
+            _ => System.Convert.ToInt64(bin, 2).ToString()
+        };
         return new ConvertResult(raw, raw);
     }
 
@@ -156,7 +195,16 @@ public class Convert
         {
             bin = BinToLittleEndian(bin);
         }
-        string raw = System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16);
+
+        string raw = settings.BitLength switch
+        {
+            8 => System.Convert.ToString(System.Convert.ToSByte(bin, 2), 16),
+            16 => System.Convert.ToString(System.Convert.ToInt16(bin, 2), 16),
+            32 => System.Convert.ToString(System.Convert.ToInt32(bin, 2), 16),
+            64 => System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16),
+            _ => System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16)
+        };
+
         if (settings.OutputEndian == SettingsHelper.BigEndian)
         {
             raw = HexToBigEndian(raw);

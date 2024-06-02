@@ -62,6 +62,15 @@ namespace PowerHexInspector
                     conversions.Add((converter.Dec2Bin(queryStr), "BIN"));
                 }
 
+                string SubTitleAddition =
+                $" ({settings.BitLength switch
+                {
+                    8 => "BYTE",
+                    16 => "WORD",
+                    32 => "DWORD",
+                    64 => "QWORD",
+                    _ => "BYTE"
+                }},{(settings.OutputEndian ? "Little Endian" : "Big Endian")})";
                 foreach ((Convert.ConvertResult res, string type) in conversions)
                 {
                     results.Add
@@ -69,7 +78,7 @@ namespace PowerHexInspector
                         new Result
                         {
                             Title = res.Format,
-                            SubTitle = type + (settings.OutputEndian ? " (Little" : " (Big") + " Endian)",
+                            SubTitle = type + SubTitleAddition,
                             IcoPath = IconPath,
                             Action = (e) =>
                             {
