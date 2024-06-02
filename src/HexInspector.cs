@@ -19,6 +19,7 @@ namespace PowerHexInspector
         private int _bitLength;
         private static readonly bool LittleEndian = true;
         private static readonly bool BigEndian = false;
+        private static readonly List<string> FilterStrs = [" ", "_", ",", "0x"];
         private bool _disposed;
         private readonly Convert converter = new Convert();
 
@@ -32,7 +33,10 @@ namespace PowerHexInspector
             {
                 return results;
             }
-            queryStr = queryStr.TrimStart();
+            foreach (string filterStr in FilterStrs)
+            {
+                queryStr = queryStr.Replace(filterStr, "");
+            }
             try
             {
                 var conversions = new List<(Convert.ConvertResult, string)>();
