@@ -1,37 +1,37 @@
 # PowerHexInspector
 
-一个简单的[powertoys run](https://learn.microsoft.com/en-us/windows/powertoys/run)插件。
+A simple [PowerToys Run](https://learn.microsoft.com/en-us/windows/powertoys/run) plugin.
 
-提供将数字转化为其他进制的功能。
+Provides functionality to convert numbers to different bases.
 
-[English Doc](./README_EN.md)
+[简体中文](./README_ZH-CN.md)
 
-## 使用方法
+## Usage
 
-### 触发关键词
+### Trigger Keyword
 
-当前触发关键词为`insp`。
+The current trigger keyword is `insp`.
 
-### 输入格式
+### Input Format
 
-输入格式为
-    
-    insp {输入进制} {输入}
+The input format is:
 
-输入进制为以下的值之一
+    insp {base} {input}
 
-- `b`或`B`：二进制
-- `d`或`D`：十进制
-- `h`或`H`：十六进制
+The base can be one of the following values:
 
-### 使用演示
+- `b` or `B`: Binary
+- `d` or `D`: Decimal
+- `h` or `H`: Hexadecimal
 
-![](./Images/examples/ep1.png)
+### Example Usage
 
-点击或按下`Enter`会将转换结果复制到剪贴板中。
+![Example](./Images/examples/ep1.png)
 
-## 安装
-下载最新的release，解压后将`PowerHexInspector`文件夹放入`%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins`文件夹中，然后重启powertoys即可。
+Clicking or pressing `Enter` will copy the conversion result to the clipboard.
 
-## 声明
-该插件还处于开发阶段，可能会有各种未知的bug和崩溃。
+## Installation
+Download the latest release, extract it, and place the `PowerHexInspector` folder into the `%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins` directory. Then, restart PowerToys.
+
+## Disclaimer
+This plugin is still in development and may have various unknown bugs and crashes.
