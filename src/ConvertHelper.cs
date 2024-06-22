@@ -7,15 +7,10 @@ public class Convert
     {
         this.settings = settingHelper;
     }
-    public class ConvertResult
+    public class ConvertResult(string raw, string format)
     {
-        public string Raw { get; set; }
-        public string Format { get; set; }
-        public ConvertResult(string raw, string format)
-        {
-            Raw = raw;
-            Format = format;
-        }
+        public string Raw { get; set; } = raw;
+        public string Format { get; set; } = format;
     }
     private string HexToBigEndian(string hex)
     {
@@ -63,14 +58,24 @@ public class Convert
     }
     public ConvertResult Dec2Hex(string dec, bool upper)
     {
-        string raw = settings.BitLength switch
+        string raw;
+        
+        try 
         {
-            8 => System.Convert.ToString(System.Convert.ToSByte(dec, 10), 16),
-            16 => System.Convert.ToString(System.Convert.ToInt16(dec, 10), 16),
-            32 => System.Convert.ToString(System.Convert.ToInt32(dec, 10), 16),
-            64 => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16),
-            _ => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16)
-        };
+            raw = settings.BitLength switch
+            {
+                8 => System.Convert.ToString(System.Convert.ToSByte(dec, 10), 16),
+                16 => System.Convert.ToString(System.Convert.ToInt16(dec, 10), 16),
+                32 => System.Convert.ToString(System.Convert.ToInt32(dec, 10), 16),
+                64 => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16),
+                _ => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16)
+            };
+        }
+        catch (Exception e) 
+        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
+        {
+            return new ConvertResult("Invalid input", "Invalid input");
+        }
 
         if (settings.InputEndian == SettingsHelper.BigEndian)
         {
@@ -88,14 +93,23 @@ public class Convert
     }
     public ConvertResult Dec2Bin(string dec)
     {
-        string raw = settings.BitLength switch
+        string raw;
+        try
         {
-            8 => System.Convert.ToString(System.Convert.ToSByte(dec, 10), 2),
-            16 => System.Convert.ToString(System.Convert.ToInt16(dec, 10), 2),
-            32 => System.Convert.ToString(System.Convert.ToInt32(dec, 10), 2),
-            64 => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2),
-            _ => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2)
-        };
+            raw = settings.BitLength switch
+            {
+                8 => System.Convert.ToString(System.Convert.ToSByte(dec, 10), 2),
+                16 => System.Convert.ToString(System.Convert.ToInt16(dec, 10), 2),
+                32 => System.Convert.ToString(System.Convert.ToInt32(dec, 10), 2),
+                64 => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2),
+                _ => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2)
+            };
+        }
+        catch (Exception e)
+        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
+        {
+            return new ConvertResult("Invalid input", "Invalid input");
+        }
 
         if (settings.InputEndian == SettingsHelper.BigEndian)
         {
@@ -124,14 +138,25 @@ public class Convert
         {
             hex = HexToLittleEndian(hex); // Convert to little endian
         }
-        string raw = settings.BitLength switch
+        string raw;
+
+        try
         {
-            8 => System.Convert.ToSByte(hex, 16).ToString(),
-            16 => System.Convert.ToInt16(hex, 16).ToString(),
-            32 => System.Convert.ToInt32(hex, 16).ToString(),
-            64 => System.Convert.ToInt64(hex, 16).ToString(),
-            _ => System.Convert.ToInt64(hex, 16).ToString(),
-        };
+            raw = settings.BitLength switch
+            {
+                8 => System.Convert.ToSByte(hex, 16).ToString(),
+                16 => System.Convert.ToInt16(hex, 16).ToString(),
+                32 => System.Convert.ToInt32(hex, 16).ToString(),
+                64 => System.Convert.ToInt64(hex, 16).ToString(),
+                _ => System.Convert.ToInt64(hex, 16).ToString(),
+            };
+        }
+        catch (Exception e)
+        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
+        {
+            return new ConvertResult("Invalid input", "Invalid input");
+        }
+
         return new ConvertResult(raw, raw);
     }
 
@@ -142,14 +167,24 @@ public class Convert
             hex = HexToLittleEndian(hex);
         }
 
-        string raw = settings.BitLength switch
+        string raw;
+
+        try
         {
-            8 => System.Convert.ToString(System.Convert.ToSByte(hex, 16), 2),
-            16 => System.Convert.ToString(System.Convert.ToInt16(hex, 16), 2),
-            32 => System.Convert.ToString(System.Convert.ToInt32(hex, 16), 2),
-            64 => System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2),
-            _ => System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2)
-        };
+            raw = settings.BitLength switch
+            {
+                8 => System.Convert.ToString(System.Convert.ToSByte(hex, 16), 2),
+                16 => System.Convert.ToString(System.Convert.ToInt16(hex, 16), 2),
+                32 => System.Convert.ToString(System.Convert.ToInt32(hex, 16), 2),
+                64 => System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2),
+                _ => System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2)
+            };
+        }
+        catch (Exception e)
+        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
+        {
+            return new ConvertResult("Invalid input", "Invalid input");
+        }
 
         if (settings.OutputEndian == SettingsHelper.BigEndian)
         {
@@ -178,14 +213,25 @@ public class Convert
         {
             bin = BinToLittleEndian(bin);
         }
-        string raw = settings.BitLength switch
+
+        string raw;
+        try
         {
-            8 => System.Convert.ToSByte(bin, 2).ToString(),
-            16 => System.Convert.ToInt16(bin, 2).ToString(),
-            32 => System.Convert.ToInt32(bin, 2).ToString(),
-            64 => System.Convert.ToInt64(bin, 2).ToString(),
-            _ => System.Convert.ToInt64(bin, 2).ToString()
-        };
+            raw = settings.BitLength switch
+            {
+                8 => System.Convert.ToSByte(bin, 2).ToString(),
+                16 => System.Convert.ToInt16(bin, 2).ToString(),
+                32 => System.Convert.ToInt32(bin, 2).ToString(),
+                64 => System.Convert.ToInt64(bin, 2).ToString(),
+                _ => System.Convert.ToInt64(bin, 2).ToString()
+            };
+        }
+        catch (Exception e)
+        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
+        {
+            return new ConvertResult("Invalid input", "Invalid input");
+        }
+
         return new ConvertResult(raw, raw);
     }
 
@@ -196,14 +242,23 @@ public class Convert
             bin = BinToLittleEndian(bin);
         }
 
-        string raw = settings.BitLength switch
+        string raw;
+        try
         {
-            8 => System.Convert.ToString(System.Convert.ToSByte(bin, 2), 16),
-            16 => System.Convert.ToString(System.Convert.ToInt16(bin, 2), 16),
-            32 => System.Convert.ToString(System.Convert.ToInt32(bin, 2), 16),
-            64 => System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16),
-            _ => System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16)
-        };
+            raw = settings.BitLength switch
+            {
+                8 => System.Convert.ToString(System.Convert.ToSByte(bin, 2), 16),
+                16 => System.Convert.ToString(System.Convert.ToInt16(bin, 2), 16),
+                32 => System.Convert.ToString(System.Convert.ToInt32(bin, 2), 16),
+                64 => System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16),
+                _ => System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16)
+            };
+        }
+        catch (Exception e)
+        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
+        {
+            return new ConvertResult("Invalid input", "Invalid input");
+        }
 
         if (settings.OutputEndian == SettingsHelper.BigEndian)
         {

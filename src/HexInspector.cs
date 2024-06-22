@@ -28,73 +28,85 @@ namespace PowerHexInspector
         {
             var results = new List<Result>();
             char queryChar = queryStr[0];
-            queryStr = queryStr.Substring(1);
+            queryStr = queryStr[1..];
             if (queryStr.Length == 0)
             {
                 return results;
             }
+
+            // Remove filtered strings from raw query string
             foreach (string filterStr in FilterStrs)
             {
                 queryStr = queryStr.Replace(filterStr, "");
             }
-            try
-            {
-                var conversions = new List<(Convert.ConvertResult, string)>();
-                if (queryChar == 'h' || queryChar == 'H')
-                {
-                    bool is_upper = queryChar == 'H';
-                    conversions.Add((converter.HexFormat(queryStr, is_upper), "HEX"));   // hex
-                    conversions.Add((converter.Hex2Dec(queryStr), "DEC"));
-                    conversions.Add((converter.Hex2Bin(queryStr), "BIN"));
-                }
-                else if (queryChar == 'b' || queryChar == 'B')
-                {
-                    bool is_upper = queryChar == 'B';
-                    conversions.Add((converter.Bin2Hex(queryStr, is_upper), "HEX"));
-                    conversions.Add((converter.Bin2Dec(queryStr), "DEC"));
-                    conversions.Add((converter.BinFormat(queryStr), "BIN"));   // bin
-                }
-                else if (queryChar == 'd' || queryChar == 'D')
-                {
-                    bool is_upper = queryChar == 'D';
-                    conversions.Add((converter.Dec2Hex(queryStr, is_upper), "HEX"));
-                    conversions.Add((converter.DecFormat(queryStr), "DEC"));   // dec
-                    conversions.Add((converter.Dec2Bin(queryStr), "BIN"));
-                }
 
-                string SubTitleAddition =
-                $" ({settings.BitLength switch
-                {
-                    8 => "BYTE",
-                    16 => "WORD",
-                    32 => "DWORD",
-                    64 => "QWORD",
-                    _ => "BYTE"
-                }},{(settings.OutputEndian ? "Little Endian" : "Big Endian")})";
-                foreach ((Convert.ConvertResult res, string type) in conversions)
-                {
-                    results.Add
-                    (
-                        new Result
-                        {
-                            Title = res.Format,
-                            SubTitle = type + SubTitleAddition,
-                            IcoPath = IconPath,
-                            Action = (e) =>
-                            {
-                                Utils.UtilsFunc.SetClipboardText(res.Raw);
-                                return true;
-                            }
-                        }
-                    );
-                }
-            }
-            catch (Exception)
+            var conversions = new List<(Convert.ConvertResult, string)>();
+            if (queryChar == 'h' || queryChar == 'H')
             {
-                return []; // empty results
+                bool is_upper = queryChar == 'H';
+                conversions.Add((converter.HexFormat(queryStr, is_upper), "HEX"));   // hex
+                conversions.Add((converter.Hex2Dec(queryStr), "DEC"));
+                conversions.Add((converter.Hex2Bin(queryStr), "BIN"));
+            }
+            else if (queryChar == 'b' || queryChar == 'B')
+            {
+                bool is_upper = queryChar == 'B';
+                conversions.Add((converter.Bin2Hex(queryStr, is_upper), "HEX"));
+                conversions.Add((converter.Bin2Dec(queryStr), "DEC"));
+                conversions.Add((converter.BinFormat(queryStr), "BIN"));   // bin
+            }
+            else if (queryChar == 'd' || queryChar == 'D')
+            {
+                bool is_upper = queryChar == 'D';
+                conversions.Add((converter.Dec2Hex(queryStr, is_upper), "HEX"));
+                conversions.Add((converter.DecFormat(queryStr), "DEC"));   // dec
+                conversions.Add((converter.Dec2Bin(queryStr), "BIN"));
+            }
+            else
+            {
+                results.Add
+                (
+                    new Result
+                    {
+                        Title = "Invalid Input",
+                        SubTitle = "Please start your query with 'h', 'b', or 'd' for hex, binary, or decimal conversion",
+                        IcoPath = IconPath,
+                        Action = (e) => true
+                    }
+                );
+                return results;
+            }
+
+            // Create result list
+            string SubTitleAddition =
+            $" ({settings.BitLength switch
+            {
+                8 => "BYTE",
+                16 => "WORD",
+                32 => "DWORD",
+                64 => "QWORD",
+                _ => "BYTE"
+            }},{(settings.OutputEndian ? "Little Endian" : "Big Endian")})";
+            foreach ((Convert.ConvertResult res, string type) in conversions)
+            {
+                results.Add
+                (
+                    new Result
+                    {
+                        Title = res.Format,
+                        SubTitle = type + SubTitleAddition,
+                        IcoPath = IconPath,
+                        Action = (e) =>
+                        {
+                            Utils.UtilsFunc.SetClipboardText(res.Raw);
+                            return true;
+                        }
+                    }
+                );
             }
             return results;
         }
+        
         public List<Result> Query(Query query)
         {
             var results = new List<Result>();
@@ -109,20 +121,30 @@ namespace PowerHexInspector
             {
                 results = ProduceResults(queryStr);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return []; // empty results
+                // Return Error message
+                return new List<Result> {
+                    new Result
+                    {
+                        Title = "Unhandled Exception",
+                        SubTitle = e.Message,
+                        IcoPath = IconPath,
+                        Action = (e) => true
+                    }
+                };
             }
 
             return results;
         }
         public void Init(PluginInitContext context)
         {
-            Log.Info("Hex Inspector plugin is initialized", typeof(HexInspector));
+            Log.Info("Hex Inspector plugin is initializeing", typeof(HexInspector));
             Context = context ?? throw new ArgumentNullException(paramName: nameof(context));
 
             Context.API.ThemeChanged += OnThemeChanged;
             UpdateIconPath(Context.API.GetCurrentTheme());
+            Log.Info("Hex Inspector plugin is initialized", typeof(HexInspector));
         }
         #endregion
 
