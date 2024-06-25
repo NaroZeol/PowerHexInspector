@@ -11,8 +11,6 @@ namespace PowerHexInspector
         public string Name => "Hex Inspector";
         public string Description => "A simple powertoys run plugin provides fast and easy way to peek other forms of an input value";
         public static string PluginID => "JSAKDJKALSJDIWDI1872Hdhad139319A";
-
-        private readonly string actionKeyword = "insp";
         private string IconPath { get; set; }
         private PluginInitContext Context { get; set; }
         private static readonly List<string> FilterStrs = [" ", "_", ",", "0x"];
@@ -27,18 +25,21 @@ namespace PowerHexInspector
         }
 
         #region IPlugin
-        private List<Result> ProduceResults(string queryStr)
+        private List<Result> ProduceResults(Query query)
         {
             var results = new List<Result>();
             char queryFormat;
+            bool isKeywordSearch = !string.IsNullOrEmpty(query.ActionKeyword);
+            bool isEmptySearch = string.IsNullOrEmpty(query.Search);
+            string queryStr = query.Search;
 
-            if (queryStr.Length == 0)
+            if (isEmptySearch && isKeywordSearch)
             {
                 results.Add
                 (
                     new Result
                     {
-                        Title = $"Usage: {actionKeyword} <format> <value>",
+                        Title = $"Usage: {query.ActionKeyword} <format> <value>",
                         SubTitle = "<format>: h/H for hex, b/B for binary, d/D for decimal",
                         IcoPath = IconPath,
                         Action = (e) => true
@@ -82,7 +83,7 @@ namespace PowerHexInspector
                 conversions.Add((converter.DecFormat(queryStr), "DEC"));   // dec
                 conversions.Add((converter.Dec2Bin(queryStr), "BIN"));
             }
-            else
+            else if (isKeywordSearch) // This search is not from global search, then return error message
             {
                 results.Add
                 (
@@ -95,6 +96,10 @@ namespace PowerHexInspector
                     }
                 );
                 return results;
+            }
+            else
+            {
+                return results; // empty query
             }
 
             // Create result list
@@ -130,7 +135,6 @@ namespace PowerHexInspector
         public List<Result> Query(Query query)
         {
             var results = new List<Result>();
-            string queryStr = query.Search;
 
             // if (queryStr.Length == 0)
             // {
@@ -139,7 +143,7 @@ namespace PowerHexInspector
 
             try
             {
-                results = ProduceResults(queryStr);
+                results = ProduceResults(query);
             }
             catch (Exception e)
             {
