@@ -11,12 +11,15 @@ namespace PowerHexInspector
         public string Name => "Hex Inspector";
         public string Description => "A simple powertoys run plugin provides fast and easy way to peek other forms of an input value";
         public static string PluginID => "JSAKDJKALSJDIWDI1872Hdhad139319A";
+
+        private readonly string actionKeyword = "insp";
         private string IconPath { get; set; }
         private PluginInitContext Context { get; set; }
         private static readonly List<string> FilterStrs = [" ", "_", ",", "0x"];
         private bool _disposed;
         private readonly SettingsHelper settings;
         private readonly Convert converter;
+        
         public HexInspector()
         {
             settings = new SettingsHelper();
@@ -27,7 +30,24 @@ namespace PowerHexInspector
         private List<Result> ProduceResults(string queryStr)
         {
             var results = new List<Result>();
-            char queryChar = queryStr[0];
+            char queryFormat;
+
+            if (queryStr.Length == 0)
+            {
+                results.Add
+                (
+                    new Result
+                    {
+                        Title = $"Usage: {actionKeyword} <format> <value>",
+                        SubTitle = "<format>: h/H for hex, b/B for binary, d/D for decimal",
+                        IcoPath = IconPath,
+                        Action = (e) => true
+                    }
+                );
+                return results;
+            }
+
+            queryFormat = queryStr[0];
             queryStr = queryStr[1..];
             if (queryStr.Length == 0)
             {
@@ -41,23 +61,23 @@ namespace PowerHexInspector
             }
 
             var conversions = new List<(Convert.ConvertResult, string)>();
-            if (queryChar == 'h' || queryChar == 'H')
+            if (queryFormat == 'h' || queryFormat == 'H')
             {
-                bool is_upper = queryChar == 'H';
+                bool is_upper = queryFormat == 'H';
                 conversions.Add((converter.HexFormat(queryStr, is_upper), "HEX"));   // hex
                 conversions.Add((converter.Hex2Dec(queryStr), "DEC"));
                 conversions.Add((converter.Hex2Bin(queryStr), "BIN"));
             }
-            else if (queryChar == 'b' || queryChar == 'B')
+            else if (queryFormat == 'b' || queryFormat == 'B')
             {
-                bool is_upper = queryChar == 'B';
+                bool is_upper = queryFormat == 'B';
                 conversions.Add((converter.Bin2Hex(queryStr, is_upper), "HEX"));
                 conversions.Add((converter.Bin2Dec(queryStr), "DEC"));
                 conversions.Add((converter.BinFormat(queryStr), "BIN"));   // bin
             }
-            else if (queryChar == 'd' || queryChar == 'D')
+            else if (queryFormat == 'd' || queryFormat == 'D')
             {
-                bool is_upper = queryChar == 'D';
+                bool is_upper = queryFormat == 'D';
                 conversions.Add((converter.Dec2Hex(queryStr, is_upper), "HEX"));
                 conversions.Add((converter.DecFormat(queryStr), "DEC"));   // dec
                 conversions.Add((converter.Dec2Bin(queryStr), "BIN"));
@@ -112,10 +132,10 @@ namespace PowerHexInspector
             var results = new List<Result>();
             string queryStr = query.Search;
 
-            if (queryStr.Length == 0)
-            {
-                return results; // empty query
-            }
+            // if (queryStr.Length == 0)
+            // {
+            //     return results; // empty query
+            // }
 
             try
             {
