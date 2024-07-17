@@ -13,7 +13,6 @@ namespace PowerHexInspector
         public static string PluginID => "JSAKDJKALSJDIWDI1872Hdhad139319A";
         private string IconPath { get; set; }
         private PluginInitContext Context { get; set; }
-        private static readonly List<string> FilterStrs = [" ", "_", ",", "0x"];
         private bool _disposed;
         private readonly SettingsHelper settings;
         private readonly Convert converter;
@@ -28,10 +27,9 @@ namespace PowerHexInspector
         private List<Result> ProduceResults(Query query)
         {
             var results = new List<Result>();
-            char queryFormat;
+            var conversions = new List<(Convert.ConvertResult, string)>();
             bool isKeywordSearch = !string.IsNullOrEmpty(query.ActionKeyword);
             bool isEmptySearch = string.IsNullOrEmpty(query.Search);
-            string queryStr = query.Search;
 
             if (isEmptySearch && isKeywordSearch)
             {
@@ -39,63 +37,47 @@ namespace PowerHexInspector
                 (
                     new Result
                     {
-                        Title = $"Usage: {query.ActionKeyword} <format> <value>",
-                        SubTitle = "<format>: h/H for hex, b/B for binary, d/D for decimal",
+                        Title = $"Usage 1: {query.ActionKeyword} [value]",
+                        SubTitle = "[value]: A C-style number, e.g. 123, 0x7b, 0b01111011, 0173",
                         IcoPath = IconPath,
                         Action = (e) => true
                     }
                 );
-                return results;
-            }
-
-            queryFormat = queryStr[0];
-            queryStr = queryStr[1..];
-            if (queryStr.Length == 0)
-            {
-                return results;
-            }
-
-            // Remove filtered strings from raw query string
-            foreach (string filterStr in FilterStrs)
-            {
-                queryStr = queryStr.Replace(filterStr, "");
-            }
-
-            var conversions = new List<(Convert.ConvertResult, string)>();
-            if (queryFormat == 'h' || queryFormat == 'H')
-            {
-                bool is_upper = queryFormat == 'H';
-                conversions.Add((converter.HexFormat(queryStr, is_upper), "HEX"));   // hex
-                conversions.Add((converter.Hex2Dec(queryStr), "DEC"));
-                conversions.Add((converter.Hex2Bin(queryStr), "BIN"));
-            }
-            else if (queryFormat == 'b' || queryFormat == 'B')
-            {
-                bool is_upper = queryFormat == 'B';
-                conversions.Add((converter.Bin2Hex(queryStr, is_upper), "HEX"));
-                conversions.Add((converter.Bin2Dec(queryStr), "DEC"));
-                conversions.Add((converter.BinFormat(queryStr), "BIN"));   // bin
-            }
-            else if (queryFormat == 'd' || queryFormat == 'D')
-            {
-                bool is_upper = queryFormat == 'D';
-                conversions.Add((converter.Dec2Hex(queryStr, is_upper), "HEX"));
-                conversions.Add((converter.DecFormat(queryStr), "DEC"));   // dec
-                conversions.Add((converter.Dec2Bin(queryStr), "BIN"));
-            }
-            else if (isKeywordSearch) // This search is not from global search, then return error message
-            {
                 results.Add
                 (
                     new Result
                     {
-                        Title = "Invalid Input",
-                        SubTitle = "Please start your query with 'h', 'b', or 'd' for hex, binary, or decimal conversion",
+                        Title = $"Usage 2: {query.ActionKeyword} [format] [value]",
+                        SubTitle = "[format]: h/H for hex, b/B for binary, d/D for decimal",
                         IcoPath = IconPath,
                         Action = (e) => true
                     }
                 );
                 return results;
+            }
+
+            QueryInterpretHelper.QueryInterpret(query, out string queryFormat, out string queryValue);
+
+            if (queryFormat == "h" || queryFormat == "H")
+            {
+                bool is_upper = queryFormat == "H";
+                conversions.Add((converter.HexFormat(queryValue, is_upper), "HEX"));   // hex
+                conversions.Add((converter.Hex2Dec(queryValue), "DEC"));
+                conversions.Add((converter.Hex2Bin(queryValue), "BIN"));
+            }
+            else if (queryFormat == "b" || queryFormat == "B")
+            {
+                bool is_upper = queryFormat == "B";
+                conversions.Add((converter.Bin2Hex(queryValue, is_upper), "HEX"));
+                conversions.Add((converter.Bin2Dec(queryValue), "DEC"));
+                conversions.Add((converter.BinFormat(queryValue), "BIN"));   // bin
+            }
+            else if (queryFormat == "d" || queryFormat == "D")
+            {
+                bool is_upper = queryFormat == "D";
+                conversions.Add((converter.Dec2Hex(queryValue, is_upper), "HEX"));
+                conversions.Add((converter.DecFormat(queryValue), "DEC"));   // dec
+                conversions.Add((converter.Dec2Bin(queryValue), "BIN"));
             }
             else
             {
