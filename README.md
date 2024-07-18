@@ -21,6 +21,7 @@ The input format is:
 The base can be one of the following values:
 
 - `b` or `B`: Binary
+- `o` or `O`: Octal
 - `d` or `D`: Decimal
 - `h` or `H`: Hexadecimal
 
