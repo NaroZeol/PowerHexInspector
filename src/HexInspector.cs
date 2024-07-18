@@ -27,7 +27,7 @@ namespace PowerHexInspector
         private List<Result> ProduceResults(Query query)
         {
             var results = new List<Result>();
-            var conversions = new List<(Convert.ConvertResult, string)>();
+            var conversions = new List<(ConvertResult, string)>();
             bool isKeywordSearch = !string.IsNullOrEmpty(query.ActionKeyword);
             bool isEmptySearch = string.IsNullOrEmpty(query.Search);
 
@@ -60,24 +60,35 @@ namespace PowerHexInspector
 
             if (queryFormat == "h" || queryFormat == "H")
             {
-                bool is_upper = queryFormat == "H";
-                conversions.Add((converter.HexFormat(queryValue, is_upper), "HEX"));   // hex
-                conversions.Add((converter.Hex2Dec(queryValue), "DEC"));
-                conversions.Add((converter.Hex2Bin(queryValue), "BIN"));
+                converter.is_upper = queryFormat == "H";
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Hex, BaseType.Hex), "HEX"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Hex, BaseType.Oct), "OCT"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Hex, BaseType.Dec), "DEC"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Hex, BaseType.Bin), "BIN"));
             }
             else if (queryFormat == "b" || queryFormat == "B")
             {
-                bool is_upper = queryFormat == "B";
-                conversions.Add((converter.Bin2Hex(queryValue, is_upper), "HEX"));
-                conversions.Add((converter.Bin2Dec(queryValue), "DEC"));
-                conversions.Add((converter.BinFormat(queryValue), "BIN"));   // bin
+                converter.is_upper = queryFormat == "B";
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Bin, BaseType.Hex), "HEX"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Bin, BaseType.Oct), "OCT"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Bin, BaseType.Dec), "DEC"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Bin, BaseType.Bin), "BIN"));
             }
             else if (queryFormat == "d" || queryFormat == "D")
             {
-                bool is_upper = queryFormat == "D";
-                conversions.Add((converter.Dec2Hex(queryValue, is_upper), "HEX"));
-                conversions.Add((converter.DecFormat(queryValue), "DEC"));   // dec
-                conversions.Add((converter.Dec2Bin(queryValue), "BIN"));
+                converter.is_upper = queryFormat == "D";
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Dec, BaseType.Hex), "HEX"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Dec, BaseType.Oct), "OCT"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Dec, BaseType.Dec), "DEC"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Dec, BaseType.Bin), "BIN"));
+            }
+            else if (queryFormat == "o" || queryFormat == "O")
+            {
+                converter.is_upper = queryFormat == "O";
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Oct, BaseType.Hex), "HEX"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Oct, BaseType.Oct), "OCT"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Oct, BaseType.Dec), "DEC"));
+                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Oct, BaseType.Bin), "BIN"));
             }
             else
             {
@@ -94,13 +105,13 @@ namespace PowerHexInspector
                 64 => "QWORD",
                 _ => "BYTE"
             }},{(settings.OutputEndian ? "Little Endian" : "Big Endian")})";
-            foreach ((Convert.ConvertResult res, string type) in conversions)
+            foreach ((ConvertResult res, string type) in conversions)
             {
                 results.Add
                 (
                     new Result
                     {
-                        Title = res.Format,
+                        Title = res.Formated,
                         SubTitle = type + SubTitleAddition,
                         IcoPath = IconPath,
                         Action = (e) =>
@@ -191,7 +202,7 @@ namespace PowerHexInspector
             new PluginAdditionalOption {
                 Key = "BitLength",
                 DisplayLabel = "Bit Lengths",
-                DisplayDescription = "",
+                DisplayDescription = "Select the bit length for the output",
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
                 ComboBoxValue = 64,
                 ComboBoxItems =

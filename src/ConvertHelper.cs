@@ -1,17 +1,21 @@
 ﻿namespace PowerHexInspector;
-
-public class Convert
+public class ConvertResult(string raw, string formated)
 {
-    private readonly SettingsHelper settings;
-    public Convert(SettingsHelper settingHelper)
-    {
-        this.settings = settingHelper;
-    }
-    public class ConvertResult(string raw, string format)
-    {
-        public string Raw { get; set; } = raw;
-        public string Format { get; set; } = format;
-    }
+    public string Raw { get; set; } = raw;
+    public string Formated { get; set; } = formated;
+}
+public enum BaseType
+{
+    Bin = 2,
+    Oct = 8,
+    Dec = 10,
+    Hex = 16,
+}
+public class Convert(SettingsHelper settingHelper)
+{
+    private readonly SettingsHelper settings = settingHelper;
+    public bool is_upper;
+
     private string HexToBigEndian(string hex)
     {
         if (hex.Length < 2)
@@ -48,6 +52,24 @@ public class Convert
         Array.Reverse(splited);
         return string.Join("", splited);
     }
+    private string OctToBigEndian(string oct)
+    {
+        if (oct.Length < 3)
+        {
+            return oct; // No need to reverse
+        }
+        if (oct.Length % 3 != 0)
+        {
+            oct = oct.PadLeft(oct.Length + (3 - oct.Length % 3), '0');
+        }
+        string[] splited = new string[oct.Length / 3];
+        for (int i = 0; i < oct.Length / 3; i++)
+        {
+            splited[i] = oct.Substring(i * 3, 3);
+        }
+        Array.Reverse(splited);
+        return string.Join("", splited);
+    }
     private string HexToLittleEndian(string hex)
     {
         return HexToBigEndian(hex); // Same logic
@@ -56,225 +78,23 @@ public class Convert
     {
         return BinToBigEndian(bin); // Same logic
     }
-    public ConvertResult Dec2Hex(string dec, bool upper)
+    private string OctToLittleEndian(string oct)
     {
-        string raw;
-        
-        try 
-        {
-            raw = settings.BitLength switch
-            {
-                8 => System.Convert.ToString(System.Convert.ToSByte(dec, 10), 16),
-                16 => System.Convert.ToString(System.Convert.ToInt16(dec, 10), 16),
-                32 => System.Convert.ToString(System.Convert.ToInt32(dec, 10), 16),
-                64 => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16),
-                _ => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 16)
-            };
-        }
-        catch (Exception e) 
-        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
-        {
-            return new ConvertResult("Invalid input", "Invalid input");
-        }
-
-        if (settings.InputEndian == SettingsHelper.BigEndian)
-        {
-            raw = HexToBigEndian(raw);
-        }
-
-        if (upper)
-        {
-            return new ConvertResult(raw.ToUpper(), raw.ToUpper());
-        }
-        else
-        {
-            return new ConvertResult(raw.ToLower(), raw.ToLower());
-        }
+        return OctToBigEndian(oct); // Same logic
     }
-    public ConvertResult Dec2Bin(string dec)
+    private string SplitBinary(string bin)
     {
-        string raw;
-        try
+        if (bin.Length % 4 != 0)
         {
-            raw = settings.BitLength switch
-            {
-                8 => System.Convert.ToString(System.Convert.ToSByte(dec, 10), 2),
-                16 => System.Convert.ToString(System.Convert.ToInt16(dec, 10), 2),
-                32 => System.Convert.ToString(System.Convert.ToInt32(dec, 10), 2),
-                64 => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2),
-                _ => System.Convert.ToString(System.Convert.ToInt64(dec, 10), 2)
-            };
+            bin = bin.PadLeft(bin.Length + (4 - bin.Length % 4), '0');
         }
-        catch (Exception e)
-        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
+        string[] splited = new string[bin.Length / 4];
+        for (int i = 0; i < bin.Length / 4; i++)
         {
-            return new ConvertResult("Invalid input", "Invalid input");
+            splited[i] = bin.Substring(i * 4, 4);
         }
-
-        if (settings.InputEndian == SettingsHelper.BigEndian)
-        {
-            raw = BinToBigEndian(raw);
-        }
-
-        if (settings.SplitBinary) // split every 4 bits
-        {
-            if (raw.Length % 4 != 0)
-            {
-                raw = raw.PadLeft(raw.Length + (4 - raw.Length % 4), '0');
-            }
-            string[] splited = new string[raw.Length / 4];
-            for (int i = 0; i < raw.Length / 4; i++)
-            {
-                splited[i] = raw.Substring(i * 4, 4);
-            }
-            return new ConvertResult(raw, string.Join(" ", splited));
-        }
-        return new ConvertResult(raw, raw);
+        return string.Join(" ", splited);
     }
-
-    public ConvertResult Hex2Dec(string hex)
-    {
-        if (settings.InputEndian == SettingsHelper.BigEndian) // input is big endian
-        {
-            hex = HexToLittleEndian(hex); // Convert to little endian
-        }
-        string raw;
-
-        try
-        {
-            raw = settings.BitLength switch
-            {
-                8 => System.Convert.ToSByte(hex, 16).ToString(),
-                16 => System.Convert.ToInt16(hex, 16).ToString(),
-                32 => System.Convert.ToInt32(hex, 16).ToString(),
-                64 => System.Convert.ToInt64(hex, 16).ToString(),
-                _ => System.Convert.ToInt64(hex, 16).ToString(),
-            };
-        }
-        catch (Exception e)
-        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
-        {
-            return new ConvertResult("Invalid input", "Invalid input");
-        }
-
-        return new ConvertResult(raw, raw);
-    }
-
-    public ConvertResult Hex2Bin(string hex)
-    {
-        if (settings.InputEndian == SettingsHelper.BigEndian)
-        {
-            hex = HexToLittleEndian(hex);
-        }
-
-        string raw;
-
-        try
-        {
-            raw = settings.BitLength switch
-            {
-                8 => System.Convert.ToString(System.Convert.ToSByte(hex, 16), 2),
-                16 => System.Convert.ToString(System.Convert.ToInt16(hex, 16), 2),
-                32 => System.Convert.ToString(System.Convert.ToInt32(hex, 16), 2),
-                64 => System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2),
-                _ => System.Convert.ToString(System.Convert.ToInt64(hex, 16), 2)
-            };
-        }
-        catch (Exception e)
-        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
-        {
-            return new ConvertResult("Invalid input", "Invalid input");
-        }
-
-        if (settings.OutputEndian == SettingsHelper.BigEndian)
-        {
-            raw = BinToBigEndian(raw);
-        }
-
-        if (settings.SplitBinary) // Insert space every 4 bits
-        {
-            if (raw.Length % 4 != 0)
-            {
-                raw = raw.PadLeft(raw.Length + (4 - raw.Length % 4), '0'); // Align to 4 bits
-            }
-            string[] splited = new string[raw.Length / 4];
-            for (int i = 0; i < raw.Length / 4; i++)
-            {
-                splited[i] = raw.Substring(i * 4, 4);
-            }
-            return new ConvertResult(raw, string.Join(" ", splited));
-        }
-        return new ConvertResult(raw, raw);
-    }
-
-    public ConvertResult Bin2Dec(string bin)
-    {
-        if (settings.InputEndian == SettingsHelper.BigEndian)
-        {
-            bin = BinToLittleEndian(bin);
-        }
-
-        string raw;
-        try
-        {
-            raw = settings.BitLength switch
-            {
-                8 => System.Convert.ToSByte(bin, 2).ToString(),
-                16 => System.Convert.ToInt16(bin, 2).ToString(),
-                32 => System.Convert.ToInt32(bin, 2).ToString(),
-                64 => System.Convert.ToInt64(bin, 2).ToString(),
-                _ => System.Convert.ToInt64(bin, 2).ToString()
-            };
-        }
-        catch (Exception e)
-        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
-        {
-            return new ConvertResult("Invalid input", "Invalid input");
-        }
-
-        return new ConvertResult(raw, raw);
-    }
-
-    public ConvertResult Bin2Hex(string bin, bool upper)
-    {
-        if (settings.InputEndian == SettingsHelper.BigEndian)
-        {
-            bin = BinToLittleEndian(bin);
-        }
-
-        string raw;
-        try
-        {
-            raw = settings.BitLength switch
-            {
-                8 => System.Convert.ToString(System.Convert.ToSByte(bin, 2), 16),
-                16 => System.Convert.ToString(System.Convert.ToInt16(bin, 2), 16),
-                32 => System.Convert.ToString(System.Convert.ToInt32(bin, 2), 16),
-                64 => System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16),
-                _ => System.Convert.ToString(System.Convert.ToInt64(bin, 2), 16)
-            };
-        }
-        catch (Exception e)
-        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
-        {
-            return new ConvertResult("Invalid input", "Invalid input");
-        }
-
-        if (settings.OutputEndian == SettingsHelper.BigEndian)
-        {
-            raw = HexToBigEndian(raw);
-        }
-
-        if (upper)
-        {
-            return new ConvertResult(raw.ToUpper(), raw.ToUpper());
-        }
-        else
-        {
-            return new ConvertResult(raw.ToLower(), raw.ToLower());
-        }
-    }
-
     public ConvertResult HexFormat(string hex, bool upper)
     {
         if (settings.InputEndian != settings.OutputEndian)
@@ -313,22 +133,70 @@ public class Convert
         }
         if (settings.SplitBinary)
         {
-            if (bin.Length % 4 != 0) // Align to 4 bits
-            {
-                bin = bin.PadLeft(bin.Length + (4 - bin.Length % 4), '0');
-            }
-            string[] splited = new string[bin.Length / 4];
-            for (int i = 0; i < bin.Length / 4; i++)
-            {
-                splited[i] = bin.Substring(i * 4, 4);
-            }
-            return new ConvertResult(bin, string.Join(" ", splited));
+            return new ConvertResult(bin, SplitBinary(bin));
         }
         return new ConvertResult(bin, bin);
+    }
+
+    public ConvertResult OctFormat(string oct)
+    {
+        if (settings.InputEndian != settings.OutputEndian)
+        {
+            if (settings.InputEndian == SettingsHelper.LittleEndian && settings.OutputEndian == SettingsHelper.BigEndian)
+            {
+                oct = OctToBigEndian(oct);
+            }
+            else if (settings.InputEndian == SettingsHelper.BigEndian && settings.OutputEndian == SettingsHelper.LittleEndian)
+            {
+                oct = OctToLittleEndian(oct);
+            }
+        }
+
+        return new ConvertResult(oct, oct);
     }
 
     public ConvertResult DecFormat(string dec)
     {
         return new ConvertResult(dec, dec);
+    }
+
+    public ConvertResult UniversalConvert(string input, BaseType fromBase, BaseType toBase)
+    {
+        try
+        {
+            string dec = settings.BitLength switch
+            {
+                8  => System.Convert.ToSByte(input, (int)fromBase).ToString(),
+                16 => System.Convert.ToInt16(input, (int)fromBase).ToString(),
+                32 => System.Convert.ToInt32(input, (int)fromBase).ToString(),
+                64 => System.Convert.ToInt64(input, (int)fromBase).ToString(),
+                _  => System.Convert.ToInt64(input, (int)fromBase).ToString()
+            };
+
+            string raw = settings.BitLength switch
+            {
+                8  => System.Convert.ToString(System.Convert.ToSByte(dec, 10), (int)toBase),
+                16 => System.Convert.ToString(System.Convert.ToInt16(dec, 10), (int)toBase),
+                32 => System.Convert.ToString(System.Convert.ToInt32(dec, 10), (int)toBase),
+                64 => System.Convert.ToString(System.Convert.ToInt64(dec, 10), (int)toBase),
+                _  => System.Convert.ToString(System.Convert.ToInt64(dec, 10), (int)toBase)
+            };
+
+            string formated = toBase switch
+            {
+                BaseType.Bin => BinFormat(raw).Formated,
+                BaseType.Oct => OctFormat(raw).Formated,
+                BaseType.Dec => DecFormat(raw).Formated,
+                BaseType.Hex => HexFormat(raw, is_upper).Formated,
+                _ => raw
+            };
+
+            return new ConvertResult(raw, formated);
+        }
+        catch (Exception e)
+        when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
+        {
+            return new ConvertResult("Invalid input", "Invalid input");
+        }
     }
 }
