@@ -24,9 +24,22 @@ The base can be one of the following values:
 - `d` or `D`: Decimal
 - `h` or `H`: Hexadecimal
 
+Or use
+
+    insp {input}
+
+In this case, the input should be a string that follows the rules below:
+
+- A string starting with `0x` will be considered hexadecimal
+- A string starting with `0b` will be considered binary
+- A string starting with `0` will be considered octal
+- Otherwise, it will be considered decimal
+
 ### Example Usage
 
-![Example](./Images/examples/ep1.png)
+![](./Images/examples/ep1.png)
+
+![](./Images/examples/ep2.png)
 
 Clicking or pressing `Enter` will copy the conversion result to the clipboard.
 
