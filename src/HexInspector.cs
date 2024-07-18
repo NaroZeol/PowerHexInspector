@@ -27,7 +27,7 @@ namespace PowerHexInspector
         private List<Result> ProduceResults(Query query)
         {
             var results = new List<Result>();
-            var conversions = new List<(ConvertResult, string)>();
+            var conversions = new List<(ConvertResult, Base)>();
             bool isKeywordSearch = !string.IsNullOrEmpty(query.ActionKeyword);
             bool isEmptySearch = string.IsNullOrEmpty(query.Search);
 
@@ -58,61 +58,47 @@ namespace PowerHexInspector
 
             QueryInterpretHelper.QueryInterpret(query, out string queryFormat, out string queryValue);
 
+            Base inputBase = Base.Dec;
             if (queryFormat == "h" || queryFormat == "H")
             {
                 converter.is_upper = queryFormat == "H";
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Hex, BaseType.Hex), "HEX"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Hex, BaseType.Oct), "OCT"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Hex, BaseType.Dec), "DEC"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Hex, BaseType.Bin), "BIN"));
+                inputBase = Base.Hex;
             }
             else if (queryFormat == "b" || queryFormat == "B")
             {
                 converter.is_upper = queryFormat == "B";
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Bin, BaseType.Hex), "HEX"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Bin, BaseType.Oct), "OCT"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Bin, BaseType.Dec), "DEC"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Bin, BaseType.Bin), "BIN"));
+                inputBase = Base.Bin;
             }
             else if (queryFormat == "d" || queryFormat == "D")
             {
                 converter.is_upper = queryFormat == "D";
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Dec, BaseType.Hex), "HEX"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Dec, BaseType.Oct), "OCT"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Dec, BaseType.Dec), "DEC"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Dec, BaseType.Bin), "BIN"));
+                inputBase = Base.Dec;
             }
             else if (queryFormat == "o" || queryFormat == "O")
             {
                 converter.is_upper = queryFormat == "O";
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Oct, BaseType.Hex), "HEX"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Oct, BaseType.Oct), "OCT"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Oct, BaseType.Dec), "DEC"));
-                conversions.Add((converter.UniversalConvert(queryValue, BaseType.Oct, BaseType.Bin), "BIN"));
+                inputBase = Base.Oct;
             }
             else
             {
                 return results; // empty query
             }
 
+            conversions.Add((converter.UniversalConvert(queryValue, inputBase, Base.Hex), Base.Hex));
+            conversions.Add((converter.UniversalConvert(queryValue, inputBase, Base.Oct), Base.Oct));
+            conversions.Add((converter.UniversalConvert(queryValue, inputBase, Base.Dec), Base.Dec));
+            conversions.Add((converter.UniversalConvert(queryValue, inputBase, Base.Bin), Base.Bin));
+
             // Create result list
-            string SubTitleAddition =
-            $" ({settings.BitLength switch
-            {
-                8 => "BYTE",
-                16 => "WORD",
-                32 => "DWORD",
-                64 => "QWORD",
-                _ => "BYTE"
-            }},{(settings.OutputEndian ? "Little Endian" : "Big Endian")})";
-            foreach ((ConvertResult res, string type) in conversions)
+            foreach ((ConvertResult res, Base type) in conversions)
             {
                 results.Add
                 (
                     new Result
                     {
                         Title = res.Formated,
-                        SubTitle = type + SubTitleAddition,
+                        SubTitle = $"{type.ToString().ToUpper()} " 
+                                 + $"({settings.BitLength}{(type == Base.Bin || type == Base.Hex ? $" {settings.OutputEndian}" : "")})",
                         IcoPath = IconPath,
                         Action = (e) =>
                         {
@@ -178,7 +164,7 @@ namespace PowerHexInspector
             new PluginAdditionalOption {
                 Key = "InputEndian",
                 DisplayLabel = "Input Endian",
-                DisplayDescription = "Little or Big Endian setting for input",
+                DisplayDescription = "Little or Big Endian setting for input, only for binary and hexacecimal",
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
                 ComboBoxValue = 0,
                 ComboBoxItems =
@@ -190,9 +176,9 @@ namespace PowerHexInspector
             new PluginAdditionalOption {
                 Key = "OutputEndian",
                 DisplayLabel = "Output Endian",
-                DisplayDescription = "Little or Big Endian setting for output",
+                DisplayDescription = "Little or Big Endian setting for output, only for binary and hexacecimal",
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
-                ComboBoxValue = 0,
+                ComboBoxValue = (int)Endian.LittleEndian,
                 ComboBoxItems =
                 [
                     new KeyValuePair<string, string>("Little Endian", "0"),
@@ -204,7 +190,7 @@ namespace PowerHexInspector
                 DisplayLabel = "Bit Lengths",
                 DisplayDescription = "Select the bit length for the output",
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
-                ComboBoxValue = 64,
+                ComboBoxValue = (int)BitLength.QWORD,
                 ComboBoxItems =
                 [
                     new KeyValuePair<string, string>("BYTE", "8"),

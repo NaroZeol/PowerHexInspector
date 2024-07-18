@@ -4,13 +4,6 @@ public class ConvertResult(string raw, string formated)
     public string Raw { get; set; } = raw;
     public string Formated { get; set; } = formated;
 }
-public enum BaseType
-{
-    Bin = 2,
-    Oct = 8,
-    Dec = 10,
-    Hex = 16,
-}
 public class Convert(SettingsHelper settingHelper)
 {
     private readonly SettingsHelper settings = settingHelper;
@@ -52,24 +45,6 @@ public class Convert(SettingsHelper settingHelper)
         Array.Reverse(splited);
         return string.Join("", splited);
     }
-    private string OctToBigEndian(string oct)
-    {
-        if (oct.Length < 3)
-        {
-            return oct; // No need to reverse
-        }
-        if (oct.Length % 3 != 0)
-        {
-            oct = oct.PadLeft(oct.Length + (3 - oct.Length % 3), '0');
-        }
-        string[] splited = new string[oct.Length / 3];
-        for (int i = 0; i < oct.Length / 3; i++)
-        {
-            splited[i] = oct.Substring(i * 3, 3);
-        }
-        Array.Reverse(splited);
-        return string.Join("", splited);
-    }
     private string HexToLittleEndian(string hex)
     {
         return HexToBigEndian(hex); // Same logic
@@ -77,10 +52,6 @@ public class Convert(SettingsHelper settingHelper)
     private string BinToLittleEndian(string bin)
     {
         return BinToBigEndian(bin); // Same logic
-    }
-    private string OctToLittleEndian(string oct)
-    {
-        return OctToBigEndian(oct); // Same logic
     }
     private string SplitBinary(string bin)
     {
@@ -97,17 +68,12 @@ public class Convert(SettingsHelper settingHelper)
     }
     public ConvertResult HexFormat(string hex, bool upper)
     {
-        if (settings.InputEndian != settings.OutputEndian)
+        // hex should be in little endian
+        if (settings.OutputEndian == Endian.BigEndian)
         {
-            if (settings.InputEndian == SettingsHelper.LittleEndian && settings.OutputEndian == SettingsHelper.BigEndian)
-            {
-                hex = HexToBigEndian(hex);
-            }
-            else if (settings.InputEndian == SettingsHelper.BigEndian && settings.OutputEndian == SettingsHelper.LittleEndian)
-            {
-                hex = HexToLittleEndian(hex);
-            }
+            hex = HexToBigEndian(hex);
         }
+
         if (upper)
         {
             return new ConvertResult(hex.ToUpper(), hex.ToUpper());
@@ -120,17 +86,12 @@ public class Convert(SettingsHelper settingHelper)
 
     public ConvertResult BinFormat(string bin)
     {
-        if (settings.InputEndian != settings.OutputEndian)
+        // bin should be in little endian
+        if (settings.OutputEndian == Endian.BigEndian)
         {
-            if (settings.InputEndian == SettingsHelper.LittleEndian && settings.OutputEndian == SettingsHelper.BigEndian)
-            {
-                bin = BinToBigEndian(bin);
-            }
-            else if (settings.InputEndian == SettingsHelper.BigEndian && settings.OutputEndian == SettingsHelper.LittleEndian)
-            {
-                bin = BinToLittleEndian(bin);
-            }
+            bin = BinToBigEndian(bin);
         }
+
         if (settings.SplitBinary)
         {
             return new ConvertResult(bin, SplitBinary(bin));
@@ -140,18 +101,7 @@ public class Convert(SettingsHelper settingHelper)
 
     public ConvertResult OctFormat(string oct)
     {
-        if (settings.InputEndian != settings.OutputEndian)
-        {
-            if (settings.InputEndian == SettingsHelper.LittleEndian && settings.OutputEndian == SettingsHelper.BigEndian)
-            {
-                oct = OctToBigEndian(oct);
-            }
-            else if (settings.InputEndian == SettingsHelper.BigEndian && settings.OutputEndian == SettingsHelper.LittleEndian)
-            {
-                oct = OctToLittleEndian(oct);
-            }
-        }
-
+        // No need to change octal format
         return new ConvertResult(oct, oct);
     }
 
@@ -160,34 +110,47 @@ public class Convert(SettingsHelper settingHelper)
         return new ConvertResult(dec, dec);
     }
 
-    public ConvertResult UniversalConvert(string input, BaseType fromBase, BaseType toBase)
+    public ConvertResult UniversalConvert(string input, Base fromBase, Base toBase)
     {
+        // Make sure the input is in the little endian before converting
+        if (settings.InputEndian == Endian.BigEndian)
+        {
+            if (fromBase == Base.Bin)
+            {
+                input = BinToLittleEndian(input);
+            }
+            else if (fromBase == Base.Hex)
+            {
+                input = HexToLittleEndian(input);
+            }
+        }
+
         try
         {
             string dec = settings.BitLength switch
             {
-                8  => System.Convert.ToSByte(input, (int)fromBase).ToString(),
-                16 => System.Convert.ToInt16(input, (int)fromBase).ToString(),
-                32 => System.Convert.ToInt32(input, (int)fromBase).ToString(),
-                64 => System.Convert.ToInt64(input, (int)fromBase).ToString(),
+                BitLength.BYTE  => System.Convert.ToSByte(input, (int)fromBase).ToString(),
+                BitLength.WORD  => System.Convert.ToInt16(input, (int)fromBase).ToString(),
+                BitLength.DWORD => System.Convert.ToInt32(input, (int)fromBase).ToString(),
+                BitLength.QWORD => System.Convert.ToInt64(input, (int)fromBase).ToString(),
                 _  => System.Convert.ToInt64(input, (int)fromBase).ToString()
             };
 
             string raw = settings.BitLength switch
             {
-                8  => System.Convert.ToString(System.Convert.ToSByte(dec, 10), (int)toBase),
-                16 => System.Convert.ToString(System.Convert.ToInt16(dec, 10), (int)toBase),
-                32 => System.Convert.ToString(System.Convert.ToInt32(dec, 10), (int)toBase),
-                64 => System.Convert.ToString(System.Convert.ToInt64(dec, 10), (int)toBase),
+                BitLength.BYTE  => System.Convert.ToString(System.Convert.ToSByte(dec, 10), (int)toBase),
+                BitLength.WORD  => System.Convert.ToString(System.Convert.ToInt16(dec, 10), (int)toBase),
+                BitLength.DWORD => System.Convert.ToString(System.Convert.ToInt32(dec, 10), (int)toBase),
+                BitLength.QWORD => System.Convert.ToString(System.Convert.ToInt64(dec, 10), (int)toBase),
                 _  => System.Convert.ToString(System.Convert.ToInt64(dec, 10), (int)toBase)
             };
 
             string formated = toBase switch
             {
-                BaseType.Bin => BinFormat(raw).Formated,
-                BaseType.Oct => OctFormat(raw).Formated,
-                BaseType.Dec => DecFormat(raw).Formated,
-                BaseType.Hex => HexFormat(raw, is_upper).Formated,
+                Base.Bin => BinFormat(raw).Formated,
+                Base.Oct => OctFormat(raw).Formated,
+                Base.Dec => DecFormat(raw).Formated,
+                Base.Hex => HexFormat(raw, is_upper).Formated,
                 _ => raw
             };
 
