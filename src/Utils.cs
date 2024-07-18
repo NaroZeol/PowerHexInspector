@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace PowerHexInspector.Utils
+namespace PowerHexInspector
 {
     public static class UtilsFunc
     {

@@ -11,25 +11,26 @@ namespace PowerHexInspector
         public string Name => "HexInspector";
         public string Description => "A simple powertoys run plugin provides fast and easy way to peek other forms of an input value";
         public static string PluginID => "JSAKDJKALSJDIWDI1872Hdhad139319A";
+
         private string IconPath { get; set; }
         private PluginInitContext Context { get; set; }
         private bool _disposed;
         private readonly SettingsHelper settings;
         private readonly Convert converter;
-        
+
         public HexInspector()
         {
             settings = new SettingsHelper();
             converter = new Convert(settings);
         }
 
-        #region IPlugin
         private List<Result> ProduceResults(Query query)
         {
             var results = new List<Result>();
             var conversions = new List<(ConvertResult, Base)>();
             bool isKeywordSearch = !string.IsNullOrEmpty(query.ActionKeyword);
             bool isEmptySearch = string.IsNullOrEmpty(query.Search);
+            Base inputBase = Base.Dec;
 
             if (isEmptySearch && isKeywordSearch)
             {
@@ -58,7 +59,6 @@ namespace PowerHexInspector
 
             QueryInterpretHelper.QueryInterpret(query, out string queryFormat, out string queryValue);
 
-            Base inputBase = Base.Dec;
             if (queryFormat == "h" || queryFormat == "H")
             {
                 converter.is_upper = queryFormat == "H";
@@ -97,12 +97,12 @@ namespace PowerHexInspector
                     new Result
                     {
                         Title = res.Formated,
-                        SubTitle = $"{type.ToString().ToUpper()} " 
+                        SubTitle = $"{type.ToString().ToUpper()} "
                                  + $"({settings.BitLength}{(type == Base.Bin || type == Base.Hex ? $" {settings.OutputEndian}" : "")})",
                         IcoPath = IconPath,
                         Action = (e) =>
                         {
-                            Utils.UtilsFunc.SetClipboardText(res.Raw);
+                            UtilsFunc.SetClipboardText(res.Raw);
                             return true;
                         }
                     }
@@ -110,15 +110,10 @@ namespace PowerHexInspector
             }
             return results;
         }
-        
+
         public List<Result> Query(Query query)
         {
             var results = new List<Result>();
-
-            // if (queryStr.Length == 0)
-            // {
-            //     return results; // empty query
-            // }
 
             try
             {
@@ -140,6 +135,7 @@ namespace PowerHexInspector
 
             return results;
         }
+
         public void Init(PluginInitContext context)
         {
             Log.Info("Hex Inspector plugin is initializeing", typeof(HexInspector));
@@ -149,10 +145,12 @@ namespace PowerHexInspector
             UpdateIconPath(Context.API.GetCurrentTheme());
             Log.Info("Hex Inspector plugin is initialized", typeof(HexInspector));
         }
-        #endregion
 
-        #region ISettingProvider
-        public Control CreateSettingPanel() { throw new NotImplementedException(); }
+        public Control CreateSettingPanel()
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<PluginAdditionalOption> AdditionalOptions { get; } = new List<PluginAdditionalOption>()
         {
             new PluginAdditionalOption {
@@ -200,14 +198,13 @@ namespace PowerHexInspector
                 ]
             }
         };
+
         public void UpdateSettings(PowerLauncherPluginSettings settings)
         {
             this.settings.UpdateSettings(settings);
             return;
         }
-        #endregion
 
-        #region Icon
         private void OnThemeChanged(Theme currentTheme, Theme newTheme)
         {
             UpdateIconPath(newTheme);
@@ -224,14 +221,13 @@ namespace PowerHexInspector
                 IconPath = "Images/HexInspector.dark.png";
             }
         }
-        #endregion
 
-        #region IDisposable
         public void Dispose()
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -247,6 +243,5 @@ namespace PowerHexInspector
                 }
             }
         }
-        #endregion
     }
 }

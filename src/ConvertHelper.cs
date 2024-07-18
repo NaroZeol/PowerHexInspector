@@ -1,9 +1,11 @@
 ﻿namespace PowerHexInspector;
+
 public class ConvertResult(string raw, string formated)
 {
     public string Raw { get; set; } = raw;
     public string Formated { get; set; } = formated;
 }
+
 public class Convert(SettingsHelper settingHelper)
 {
     private readonly SettingsHelper settings = settingHelper;
@@ -27,6 +29,7 @@ public class Convert(SettingsHelper settingHelper)
         Array.Reverse(splited);
         return string.Join("", splited);
     }
+
     private string BinToBigEndian(string bin)
     {
         if (bin.Length < 8)
@@ -45,14 +48,17 @@ public class Convert(SettingsHelper settingHelper)
         Array.Reverse(splited);
         return string.Join("", splited);
     }
+
     private string HexToLittleEndian(string hex)
     {
         return HexToBigEndian(hex); // Same logic
     }
+
     private string BinToLittleEndian(string bin)
     {
         return BinToBigEndian(bin); // Same logic
     }
+
     private string SplitBinary(string bin)
     {
         if (bin.Length % 4 != 0)
@@ -66,6 +72,7 @@ public class Convert(SettingsHelper settingHelper)
         }
         return string.Join(" ", splited);
     }
+
     public ConvertResult HexFormat(string hex, bool upper)
     {
         // hex should be in little endian

@@ -8,6 +8,7 @@ namespace PowerHexInspector
         public Endian InputEndian;
         public Endian OutputEndian;
         public BitLength BitLength;
+        
         public void UpdateSettings(PowerLauncherPluginSettings settings)
         {
             var _splitBinary = true;
