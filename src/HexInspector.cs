@@ -8,7 +8,7 @@ namespace PowerHexInspector
 {
     public class HexInspector : IPlugin, IDisposable, ISettingProvider
     {
-        public string Name => "Hex Inspector";
+        public string Name => "HexInspector";
         public string Description => "A simple powertoys run plugin provides fast and easy way to peek other forms of an input value";
         public static string PluginID => "JSAKDJKALSJDIWDI1872Hdhad139319A";
         private string IconPath { get; set; }

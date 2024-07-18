@@ -4,8 +4,9 @@
   "IsGlobal": false,
   "Name": "HexInspector",
   "Author": "NaroZeol",
-  "Version": "0.2.1",
+  "Version": "0.3.0",
   "Language": "csharp",
+  "Website": "https://github.com/NaroZeol/PowerHexInspector",
   "ExecuteFileName": "Community.PowerToys.Run.Plugin.HexInspector.dll",
   "IcoPathDark": "Images\\HexInspector.dark.png",
   "IcoPathLight": "Images\\HexInspector.light.png"
