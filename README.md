@@ -1,5 +1,8 @@
 # PowerHexInspector
 
+[![Mentioned in Awesome PowerToys Run Plugins](https://awesome.re/mentioned-badge.svg)](https://github.com/hlaueriksson/awesome-powertoys-run-plugins)
+[![Mentioned in Awesome PowerToys Run Plugins](https://awesome.re/mentioned-badge-flat.svg)](https://github.com/hlaueriksson/awesome-powertoys-run-plugins)
+
 A simple [PowerToys Run](https://learn.microsoft.com/en-us/windows/powertoys/run) plugin.
 
 Provides functionality to convert numbers to different bases.

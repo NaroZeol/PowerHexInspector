@@ -1,5 +1,8 @@
 # PowerHexInspector
 
+[![Mentioned in Awesome PowerToys Run Plugins](https://awesome.re/mentioned-badge.svg)](https://github.com/hlaueriksson/awesome-powertoys-run-plugins)
+[![Mentioned in Awesome PowerToys Run Plugins](https://awesome.re/mentioned-badge-flat.svg)](https://github.com/hlaueriksson/awesome-powertoys-run-plugins)
+
 一个简单的[powertoys run](https://learn.microsoft.com/en-us/windows/powertoys/run)插件。
 
 提供将数字转化为其他进制的功能。
