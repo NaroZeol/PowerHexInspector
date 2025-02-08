@@ -2,6 +2,7 @@ namespace PowerHexInspector
 {
     public enum Base
     {
+        Invalid = -1,
         Bin = 2,
         Oct = 8,
         Dec = 10,

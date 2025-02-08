@@ -30,7 +30,6 @@ namespace PowerHexInspector
             var conversions = new List<(ConvertResult, Base)>();
             bool isKeywordSearch = !string.IsNullOrEmpty(query.ActionKeyword);
             bool isEmptySearch = string.IsNullOrEmpty(query.Search);
-            Base inputBase = Base.Dec;
 
             if (isEmptySearch && isKeywordSearch)
             {
@@ -57,37 +56,17 @@ namespace PowerHexInspector
                 return results;
             }
 
-            QueryInterpretHelper.QueryInterpret(query, out string queryFormat, out string queryValue);
-
-            if (queryFormat == "h" || queryFormat == "H")
+            QueryInterpretHelper.QueryInterpret(query, out Base queryBase, out string queryValue, out bool isUpper);
+            if (queryBase == Base.Invalid)
             {
-                converter.is_upper = queryFormat == "H";
-                inputBase = Base.Hex;
-            }
-            else if (queryFormat == "b" || queryFormat == "B")
-            {
-                converter.is_upper = queryFormat == "B";
-                inputBase = Base.Bin;
-            }
-            else if (queryFormat == "d" || queryFormat == "D")
-            {
-                converter.is_upper = queryFormat == "D";
-                inputBase = Base.Dec;
-            }
-            else if (queryFormat == "o" || queryFormat == "O")
-            {
-                converter.is_upper = queryFormat == "O";
-                inputBase = Base.Oct;
-            }
-            else
-            {
-                return results; // empty query
+                return results;
             }
 
-            conversions.Add((converter.UniversalConvert(queryValue, inputBase, Base.Hex), Base.Hex));
-            conversions.Add((converter.UniversalConvert(queryValue, inputBase, Base.Oct), Base.Oct));
-            conversions.Add((converter.UniversalConvert(queryValue, inputBase, Base.Dec), Base.Dec));
-            conversions.Add((converter.UniversalConvert(queryValue, inputBase, Base.Bin), Base.Bin));
+            converter.is_upper = isUpper;
+            conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Hex), Base.Hex));
+            conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Oct), Base.Oct));
+            conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Dec), Base.Dec));
+            conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Bin), Base.Bin));
 
             // Create result list
             foreach ((ConvertResult res, Base type) in conversions)

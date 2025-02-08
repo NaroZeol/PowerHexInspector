@@ -5,19 +5,22 @@ namespace PowerHexInspector
 {
     public static class QueryInterpretHelper
     {
+        private static readonly string FilterPattern = "_,";
+
         private static string ReplaceFirstOccurrence(string input, string pattern, string replacement)
         {
             Regex regex = new Regex(pattern);
             return regex.Replace(input, replacement, 1);
         }
-        private static readonly string FilterPattern = "_,";
-        public static void QueryInterpret(Query query, out string queryFormat, out string queryValue)
+
+        public static void QueryInterpret(Query query, out Base queryBase, out string queryValue, out bool isUpper)
         {
             var terms = query.Terms;
-            queryFormat = "";
+            queryBase = Base.Invalid;
             queryValue = "";
+            isUpper = false;
 
-            // Use C-Style:
+            // Use C-Style: (only allow lowercase 'x' and 'b')
             // {value}   -> Decimal
             // 0{value}  -> Octal
             // 0x{value} -> Hex
@@ -31,28 +34,36 @@ namespace PowerHexInspector
 
                 if (Regex.IsMatch(terms[0], decimalPattern) || terms[0] == "0" || terms[0] == "-0")
                 {
-                    queryFormat = "d";
+                    queryBase = Base.Dec;
                     queryValue = terms[0];
                 }
                 else if (Regex.IsMatch(terms[0], octalPattern))
                 {
-                    queryFormat = "o";
+                    queryBase = Base.Oct;
                     queryValue = ReplaceFirstOccurrence(terms[0], "0", "");
                 }
                 else if (Regex.IsMatch(terms[0], hexPattern))
                 {
-                    queryFormat = "h";
+                    queryBase = Base.Hex;
                     queryValue = ReplaceFirstOccurrence(terms[0], "0x", "");
                 }
                 else if (Regex.IsMatch(terms[0], binaryPattern))
                 {
-                    queryFormat = "b";
+                    queryBase = Base.Bin;
                     queryValue = ReplaceFirstOccurrence(terms[0], "0b", "");
                 }
             }
             else if (terms.Count >= 2) // Use specific Format: {Keyword} [Format] [Value]
             {
-                queryFormat = terms[0];
+                queryBase = terms[0].ToLower() switch
+                {
+                    "h" => Base.Hex,
+                    "b" => Base.Bin,
+                    "d" => Base.Dec,
+                    "o" => Base.Oct,
+                    _ => Base.Invalid   
+                };
+                isUpper = char.IsUpper(terms[0][0]);
                 queryValue = string.Join(" ", terms.Skip(1));
             }
 
