@@ -141,7 +141,7 @@ namespace PowerHexInspector
             new PluginAdditionalOption {
                 Key = "InputEndian",
                 DisplayLabel = "Input Endian",
-                DisplayDescription = "Little or Big Endian setting for input, only for binary and hexacecimal",
+                DisplayDescription = "Little or Big Endian setting for input, only for binary and hexadecimal",
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
                 ComboBoxValue = 0,
                 ComboBoxItems =
@@ -153,7 +153,7 @@ namespace PowerHexInspector
             new PluginAdditionalOption {
                 Key = "OutputEndian",
                 DisplayLabel = "Output Endian",
-                DisplayDescription = "Little or Big Endian setting for output, only for binary and hexacecimal",
+                DisplayDescription = "Little or Big Endian setting for output, only for binary and hexadecimal",
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
                 ComboBoxValue = (int)Endian.LittleEndian,
                 ComboBoxItems =
