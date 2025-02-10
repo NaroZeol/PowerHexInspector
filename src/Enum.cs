@@ -21,5 +21,6 @@ namespace PowerHexInspector
         WORD = 16,
         DWORD = 32,
         QWORD = 64,
+        UNLIMITED = -1,
     }
 }

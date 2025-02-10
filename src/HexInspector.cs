@@ -63,9 +63,9 @@ namespace PowerHexInspector
             }
 
             converter.is_upper = isUpper;
-            conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Hex), Base.Hex));
             conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Oct), Base.Oct));
             conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Dec), Base.Dec));
+            conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Hex), Base.Hex));
             conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Bin), Base.Bin));
 
             // Create result list
@@ -165,15 +165,16 @@ namespace PowerHexInspector
             new PluginAdditionalOption {
                 Key = "BitLength",
                 DisplayLabel = "Bit Lengths",
-                DisplayDescription = "Select the bit length for the output",
+                DisplayDescription = "Select the bit length for the output, influence negative number",
                 PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Combobox,
-                ComboBoxValue = (int)BitLength.QWORD,
+                ComboBoxValue = (int)BitLength.UNLIMITED,
                 ComboBoxItems =
                 [
                     new KeyValuePair<string, string>("BYTE", "8"),
                     new KeyValuePair<string, string>("WORD", "16"),
                     new KeyValuePair<string, string>("DWORD", "32"),
                     new KeyValuePair<string, string>("QWORD", "64"),
+                    new KeyValuePair<string, string>("UNLIMITED", "-1"),
                 ]
             }
         };

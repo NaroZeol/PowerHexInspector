@@ -1,4 +1,6 @@
-﻿namespace PowerHexInspector;
+﻿using System.Numerics;
+
+namespace PowerHexInspector;
 
 public class ConvertResult(string raw, string formated)
 {
@@ -117,6 +119,57 @@ public class Convert(SettingsHelper settingHelper)
         return new ConvertResult(dec, dec);
     }
 
+    // Convert string to BigInteger(Decimal)
+    public BigInteger BigIntegerConvert(string input, Base fromBase) => fromBase switch
+    {
+        Base.Bin => System.Numerics.BigInteger.Parse(input, System.Globalization.NumberStyles.BinaryNumber),
+        Base.Oct=> new Func<BigInteger>( // BigInterger.Parse() does not support octal, fxxk mixxxxxft
+            () => {
+                BigInteger result = 0;
+                for (int i = 0; i < input.Length; i++)
+                {
+                    result += (input[i] - '0') * BigInteger.Pow(8, input.Length - i - 1);
+                }
+                return result;
+            }
+        )(),
+        Base.Dec => System.Numerics.BigInteger.Parse(input),
+        Base.Hex => System.Numerics.BigInteger.Parse(input, System.Globalization.NumberStyles.HexNumber),
+        Base.Ascii => new Func<BigInteger>(
+            () => {
+                byte[] bytes = System.Text.Encoding.ASCII.GetBytes(input).Reverse().ToArray();
+                return new BigInteger(bytes);
+            }
+        )(),
+        _ => throw new System.ArgumentException("Invalid base", nameof(fromBase))
+    };
+
+    // Convert BigInteger(Decimal) to string
+    public string ConvertBigInteger(BigInteger input, Base toBase) => toBase switch
+    {
+        Base.Bin => input.ToString("B"),
+        Base.Oct => new Func<string>(
+            () => {
+                string result = "";
+                while (input > 0)
+                {
+                    result = (input % 8).ToString() + result;
+                    input /= 8;
+                }
+                return result;
+            }
+        )(),
+        Base.Dec => input.ToString(),
+        Base.Hex => input.ToString("X"),
+        Base.Ascii => new Func<string>(
+            () => {
+                byte[] bytes = input.ToByteArray().Reverse().ToArray();
+                return System.Text.Encoding.ASCII.GetString(bytes);
+            }
+        )(),
+        _ => throw new System.ArgumentException("Invalid base", nameof(toBase))
+    };
+
     public ConvertResult UniversalConvert(string input, Base fromBase, Base toBase)
     {
         // Make sure the input is in the little endian before converting
@@ -140,6 +193,7 @@ public class Convert(SettingsHelper settingHelper)
                 BitLength.WORD  => System.Convert.ToInt16(input, (int)fromBase).ToString(),
                 BitLength.DWORD => System.Convert.ToInt32(input, (int)fromBase).ToString(),
                 BitLength.QWORD => System.Convert.ToInt64(input, (int)fromBase).ToString(),
+                BitLength.UNLIMITED => BigIntegerConvert(input, fromBase).ToString(),
                 _  => System.Convert.ToInt64(input, (int)fromBase).ToString()
             };
 
@@ -149,6 +203,7 @@ public class Convert(SettingsHelper settingHelper)
                 BitLength.WORD  => System.Convert.ToString(System.Convert.ToInt16(dec, 10), (int)toBase),
                 BitLength.DWORD => System.Convert.ToString(System.Convert.ToInt32(dec, 10), (int)toBase),
                 BitLength.QWORD => System.Convert.ToString(System.Convert.ToInt64(dec, 10), (int)toBase),
+                BitLength.UNLIMITED => ConvertBigInteger(BigInteger.Parse(dec), toBase),
                 _  => System.Convert.ToString(System.Convert.ToInt64(dec, 10), (int)toBase)
             };
 
@@ -166,6 +221,7 @@ public class Convert(SettingsHelper settingHelper)
         catch (Exception e)
         when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
         {
+            // TODO: friendly error message
             return new ConvertResult("Invalid input", "Invalid input");
         }
     }
