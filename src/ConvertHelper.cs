@@ -227,13 +227,6 @@ public class Convert(SettingsHelper settingHelper)
             };
         }
 
-        // Check if the input is negative for unlimited bitlenth
-        if (settings.BitLength == BitLength.UNLIMITED && input.Contains('-'))
-        {
-            return new ConvertResult("Negative number is not supported for unlimited bitlenth",
-                                        "Negative number is not supported for Unlimited bitlenth");
-        }
-
         try
         {
             string dec = settings.BitLength switch
@@ -273,8 +266,14 @@ public class Convert(SettingsHelper settingHelper)
         catch (Exception e)
         when (e is FormatException || e is InvalidCastException || e is OverflowException || e is ArgumentNullException)
         {
-            // TODO: friendly error message
-            return new ConvertResult("Invalid input", "Invalid input");
+            return e switch 
+            {
+                FormatException         => new ConvertResult("Invalid format", "Invalid format"),
+                InvalidCastException    => new ConvertResult("Invalid cast", "Invalid cast"),
+                OverflowException       => new ConvertResult("Overflow", "Overflow"),
+                ArgumentNullException   => new ConvertResult("Null argument", "Null argument"),
+                _                       => new ConvertResult("Unknown error", "Unknown error")
+            };
         }
     }
 }

@@ -57,10 +57,10 @@ namespace PowerHexInspector
             }
 
             QueryInterpretHelper.QueryInterpret(query, out Base queryBase, out string queryValue, out bool isUpper);
-            if (queryBase == Base.Invalid || 
-                (queryBase == Base.Ascii && queryValue.Length == 0))
+            (bool vaild, List<Result> checkRes) = CheckInput(queryBase, queryValue);
+            if (!vaild)
             {
-                return results;
+                return checkRes;
             }
 
             converter.is_upper = isUpper;
@@ -92,6 +92,32 @@ namespace PowerHexInspector
             return results;
         }
 
+        private (bool vaild, List<Result> checkRes) CheckInput(Base queryBase, string queryValue)
+        {
+            if (queryBase == Base.Invalid ||
+                (queryBase == Base.Ascii && queryValue.Length == 0))
+            {
+                return (vaild: false, checkRes: []);
+            }
+
+            if (settings.BitLength == BitLength.UNLIMITED && queryBase != Base.Ascii && queryValue.Contains('-'))
+            {
+                return 
+                    (vaild:false,
+                    checkRes: new List<Result> {
+                        new Result
+                        {
+                            Title = "Negative number is not supported for unlimited bit length",
+                            SubTitle = "Please select a limited bit length for negative number in settings",
+                            IcoPath = IconPath,
+                            Action = (e) => true
+                        }
+                    });
+            }
+
+            return (vaild: true, checkRes: null);
+        }
+
         public List<Result> Query(Query query)
         {
             var results = new List<Result>();
@@ -102,14 +128,19 @@ namespace PowerHexInspector
             }
             catch (Exception e)
             {
+                Log.Info($"Unhandled Exception: {e.Message} {e.StackTrace}", typeof(HexInspector));
                 // Return Error message
                 return new List<Result> {
                     new Result
                     {
                         Title = "Unhandled Exception",
-                        SubTitle = e.Message,
+                        SubTitle = @"Check log(%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Logs) for more information",
                         IcoPath = IconPath,
-                        Action = (e) => true
+                        Action = (e) => 
+                        {
+                            UtilsFunc.SetClipboardText(@"%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Logs");
+                            return true;
+                        }
                     }
                 };
             }
@@ -119,12 +150,12 @@ namespace PowerHexInspector
 
         public void Init(PluginInitContext context)
         {
-            Log.Info("Hex Inspector plugin is initializeing", typeof(HexInspector));
+            Log.Info("HexInspector plugin is initializeing", typeof(HexInspector));
             Context = context ?? throw new ArgumentNullException(paramName: nameof(context));
 
             Context.API.ThemeChanged += OnThemeChanged;
             UpdateIconPath(Context.API.GetCurrentTheme());
-            Log.Info("Hex Inspector plugin is initialized", typeof(HexInspector));
+            Log.Info("HexInspector plugin is initialized", typeof(HexInspector));
         }
 
         public Control CreateSettingPanel()
