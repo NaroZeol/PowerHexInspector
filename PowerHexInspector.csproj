@@ -8,6 +8,7 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <AssemblyName>Community.PowerToys.Run.Plugin.HexInspector</AssemblyName>
     <Platforms>ARM64;x64</Platforms>
+    <Version>0.4.0</Version>
   </PropertyGroup>
 
 	<ItemGroup>
