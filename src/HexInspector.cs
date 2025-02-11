@@ -57,7 +57,8 @@ namespace PowerHexInspector
             }
 
             QueryInterpretHelper.QueryInterpret(query, out Base queryBase, out string queryValue, out bool isUpper);
-            if (queryBase == Base.Invalid)
+            if (queryBase == Base.Invalid || 
+                (queryBase == Base.Ascii && queryValue.Length == 0))
             {
                 return results;
             }
