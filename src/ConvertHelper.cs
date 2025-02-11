@@ -153,7 +153,13 @@ public class Convert(SettingsHelper settingHelper)
 
     // integer(Decimal) to Ascii
     public string IntToAscii(string dec) => 
-        System.Text.Encoding.ASCII.GetString(System.BitConverter.GetBytes(System.Convert.ToInt64(dec, 10)));
+        new string (
+            System.Text.Encoding.ASCII.GetString(
+                System.BitConverter.GetBytes(System.Convert.ToInt64(dec, 10)))
+                .TrimEnd('\0') // Remove null character
+                .Reverse()
+                .ToArray()
+            );
 
     // Convert string to BigInteger(Decimal)
     public BigInteger BigIntegerConvert(string input, Base fromBase) => fromBase switch
