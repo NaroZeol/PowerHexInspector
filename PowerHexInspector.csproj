@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows10.0.22621.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <useWPF>true</useWPF>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -10,30 +10,19 @@
     <Platforms>ARM64;x64</Platforms>
   </PropertyGroup>
 
-	<ItemGroup Condition="'$(Platform)' == 'x64'">
-		<Reference Include="Libs\x64\PowerToys.Common.UI.dll" />
-		<Reference Include="Libs\x64\PowerToys.ManagedCommon.dll" />
-		<Reference Include="Libs\x64\PowerToys.Settings.UI.Lib.dll" />
-		<Reference Include="Libs\x64\Wox.Infrastructure.dll" />
-		<Reference Include="Libs\x64\Wox.Plugin.dll" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Platform)' == 'ARM64'">
-		<Reference Include="Libs\ARM64\PowerToys.Common.UI.dll" />
-		<Reference Include="Libs\ARM64\PowerToys.ManagedCommon.dll" />
-		<Reference Include="Libs\ARM64\PowerToys.Settings.UI.Lib.dll" />
-		<Reference Include="Libs\ARM64\Wox.Infrastructure.dll" />
-		<Reference Include="Libs\ARM64\Wox.Plugin.dll" />
+	<ItemGroup>
+	  <PackageReference Include="Community.PowerToys.Run.Plugin.Dependencies" Version="0.88.0" />
 	</ItemGroup>
 	
-    <Target Name="Movefiles" AfterTargets="Build">
-        <ItemGroup>
-            <MySourceFiles Include="./plugin.json" />
-            <MySourceFiles Include="$(OutputPath)Community.PowerToys.Run.Plugin.HexInspector.dll" />
-            <ImagesFile Include="./Images/*.*" />
-        </ItemGroup>
-        <Copy SourceFiles="@(MySourceFiles)" DestinationFolder="./bin/output-$(Platform)/HexInspector" />
-        <Copy SourceFiles="@(ImagesFile)" DestinationFolder="./bin/output-$(Platform)/HexInspector/Images" />
-    </Target>
+  <!--Use "dotnet build -p:Platform={X64/ARM64}" to build project-->
+  <Target Name="Movefiles" AfterTargets="Build">
+      <ItemGroup>
+          <MySourceFiles Include="./plugin.json" />
+          <MySourceFiles Include="$(OutputPath)Community.PowerToys.Run.Plugin.HexInspector.dll" />
+          <ImagesFile Include="./Images/*.*" />
+      </ItemGroup>
+      <Copy SourceFiles="@(MySourceFiles)" DestinationFolder="./bin/output-$(Platform)/HexInspector" />
+      <Copy SourceFiles="@(ImagesFile)" DestinationFolder="./bin/output-$(Platform)/HexInspector/Images" />
+  </Target>
 
 </Project>
