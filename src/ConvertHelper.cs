@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Text;
 
-namespace PowerHexInspector;
+namespace Community.PowerToys.Run.Plugin.HexInspector;
 
 public class ConvertResult(string raw, string formated)
 {

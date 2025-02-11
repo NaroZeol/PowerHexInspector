@@ -1,4 +1,4 @@
-namespace PowerHexInspector
+namespace Community.PowerToys.Run.Plugin.HexInspector
 {
     public enum Base
     {

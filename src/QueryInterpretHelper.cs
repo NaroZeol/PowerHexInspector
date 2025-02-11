@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Wox.Plugin;
 
-namespace PowerHexInspector
+namespace Community.PowerToys.Run.Plugin.HexInspector
 {
     public static class QueryInterpretHelper
     {

@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace PowerHexInspector
+namespace Community.PowerToys.Run.Plugin.HexInspector
 {
     public static class UtilsFunc
     {

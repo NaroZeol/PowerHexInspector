@@ -1,6 +1,6 @@
 using Microsoft.PowerToys.Settings.UI.Library;
 
-namespace PowerHexInspector
+namespace Community.PowerToys.Run.Plugin.HexInspector
 {
     public class SettingsHelper
     {

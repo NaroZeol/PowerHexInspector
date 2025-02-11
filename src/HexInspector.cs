@@ -4,9 +4,9 @@ using Microsoft.PowerToys.Settings.UI.Library;
 using System.Windows.Controls;
 using ManagedCommon;
 
-namespace PowerHexInspector
+namespace Community.PowerToys.Run.Plugin.HexInspector
 {
-    public class HexInspector : IPlugin, IDisposable, ISettingProvider
+    public class Main : IPlugin, IDisposable, ISettingProvider
     {
         public string Name => "HexInspector";
         public string Description => "A simple powertoys run plugin provides fast and easy way to peek other forms of an input value";
@@ -18,7 +18,7 @@ namespace PowerHexInspector
         private readonly SettingsHelper settings;
         private readonly Convert converter;
 
-        public HexInspector()
+        public Main()
         {
             settings = new SettingsHelper();
             converter = new Convert(settings);
@@ -128,7 +128,7 @@ namespace PowerHexInspector
             }
             catch (Exception e)
             {
-                Log.Info($"Unhandled Exception: {e.Message} {e.StackTrace}", typeof(HexInspector));
+                Log.Info($"Unhandled Exception: {e.Message} {e.StackTrace}", typeof(Main));
                 // Return Error message
                 return new List<Result> {
                     new Result
@@ -150,12 +150,12 @@ namespace PowerHexInspector
 
         public void Init(PluginInitContext context)
         {
-            Log.Info("HexInspector plugin is initializeing", typeof(HexInspector));
+            Log.Info("HexInspector plugin is initializeing", typeof(Main));
             Context = context ?? throw new ArgumentNullException(paramName: nameof(context));
 
             Context.API.ThemeChanged += OnThemeChanged;
             UpdateIconPath(Context.API.GetCurrentTheme());
-            Log.Info("HexInspector plugin is initialized", typeof(HexInspector));
+            Log.Info("HexInspector plugin is initialized", typeof(Main));
         }
 
         public Control CreateSettingPanel()
