@@ -193,6 +193,11 @@ public class Convert(SettingsHelper settingHelper)
         Base.Bin => input.ToString("B"),
         Base.Oct => new Func<string>(
             () => {
+                if (input == 0)
+                {
+                    return "0";
+                }
+
                 string result = "";
                 while (input > 0)
                 {
