@@ -27,6 +27,7 @@ The base can be one of the following values:
 - `o` or `O`: Octal
 - `d` or `D`: Decimal
 - `h` or `H`: Hexadecimal
+- `a` or `A`: ASCII
 
 Or use
 
@@ -37,9 +38,10 @@ In this case, the input should be a string that follows the rules below:
 - A string starting with `0x` will be considered hexadecimal
 - A string starting with `0b` will be considered binary
 - A string starting with `0` will be considered octal
+- A string surrounded by double quotes will be considered ASCII
 - Otherwise, it will be considered decimal
 
-### Example Usage
+### Example
 
 ![](./Images/examples/ep1.png)
 
@@ -49,6 +51,3 @@ Clicking or pressing `Enter` will copy the conversion result to the clipboard.
 
 ## Installation
 Download the latest release, extract it, and place the `PowerHexInspector` folder into the `%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins` directory. Then, restart PowerToys.
-
-## Disclaimer
-This plugin is still in development and may have various unknown bugs and crashes.

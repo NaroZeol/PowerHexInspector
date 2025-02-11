@@ -38,7 +38,7 @@ namespace PowerHexInspector
                     new Result
                     {
                         Title = $"Usage 1: {query.ActionKeyword} [value]",
-                        SubTitle = "[value]: A C-style number, e.g. 123, 0x7b, 0b01111011, 0173",
+                        SubTitle = "[value]: A C-style value, e.g. 65, 0x41, 0b01000001, 0101, \"A\"",
                         IcoPath = IconPath,
                         Action = (e) => true
                     }
@@ -48,7 +48,7 @@ namespace PowerHexInspector
                     new Result
                     {
                         Title = $"Usage 2: {query.ActionKeyword} [format] [value]",
-                        SubTitle = "[format]: h/H for hex, b/B for binary, d/D for decimal",
+                        SubTitle = "[format]: h/H for hex, b/B for binary, d/D for decimal, o/O for octal, a/A for ascii",
                         IcoPath = IconPath,
                         Action = (e) => true
                     }
