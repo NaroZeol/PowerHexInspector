@@ -7,6 +7,7 @@ namespace PowerHexInspector
         Oct = 8,
         Dec = 10,
         Hex = 16,
+        Ascii = 256,
     }
 
     public enum Endian

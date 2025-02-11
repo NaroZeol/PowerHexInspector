@@ -67,6 +67,7 @@ namespace PowerHexInspector
             conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Dec), Base.Dec));
             conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Hex), Base.Hex));
             conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Bin), Base.Bin));
+            conversions.Add((converter.UniversalConvert(queryValue, queryBase, Base.Ascii), Base.Ascii));
 
             // Create result list
             foreach ((ConvertResult res, Base type) in conversions)
@@ -77,7 +78,7 @@ namespace PowerHexInspector
                     {
                         Title = res.Formated,
                         SubTitle = $"{type.ToString().ToUpper()} "
-                                 + $"({settings.BitLength}{(type == Base.Bin || type == Base.Hex ? $" {settings.OutputEndian}" : "")})",
+                                 + $"({settings.BitLength}{(type == Base.Bin || type == Base.Hex || type == Base.Ascii ? $" {settings.OutputEndian}" : "")})",
                         IcoPath = IconPath,
                         Action = (e) =>
                         {
